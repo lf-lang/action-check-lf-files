@@ -18,6 +18,10 @@ inputs:
     required: false
     description: 'Use existing clone of lingua-franca'
     default: false
+  ignore_failing:
+    required: false
+    description: 'Ignore files already marked as failing'
+    default: true
 runs:
   using: 'node16'
   main: 'dist/index.js'

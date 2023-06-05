@@ -7,9 +7,16 @@ const readdir = promisify(fs.readdir)
 const lstat = promisify(fs.lstat)
 const exec = promisify(child_process.exec)
 
-const ignore = [core.getInput('checkout_dir'), 'node_modules'] //, 'failing']
+const skipDirs = [core.getInput('checkout_dir'), 'node_modules', 'src-gen']
 
-export async function checkAll(dir: string): Promise<boolean> {
+function skipDir(dirName: string, skipFailed: boolean): boolean {
+  if (skipDirs.includes(dirName) || (skipFailed && dirName.includes('fail'))) {
+    return true
+  }
+  return false
+}
+
+export async function checkAll(dir: string, ignore: boolean): Promise<boolean> {
   let passed = true
 
   const files = await readdir(dir)
@@ -18,9 +25,9 @@ export async function checkAll(dir: string): Promise<boolean> {
     const filePath = `${dir}/${fileName}`
     const fileStats = await lstat(filePath)
 
-    if (fileStats.isDirectory() && !ignore.includes(fileName)) {
+    if (fileStats.isDirectory() && skipDir(fileName, ignore)) {
       // Recursively traverse subdirectories
-      passed = (await checkAll(filePath)) && passed
+      passed = (await checkAll(filePath, ignore)) && passed
     } else if (fileName.endsWith('.lf')) {
       // Invoke command on file
       try {

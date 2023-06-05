@@ -17,10 +17,27 @@ const quick = false // change to true for quicker testing
 // }
 
 // shows how the runner will run a javascript action with env / stdout protocol
-test('test runs', async () => {
-  process.env['INPUT_CHECKOUT_DIR'] = 'lingua-franca'
+test('run directly', async () => {
+  process.env['INPUT_CHECKOUT_DIR'] = 'lingua-franca2'
   process.env['INPUT_COMPILER_REF'] = 'master'
   process.env['INPUT_DELETE_IF_EXISTS'] = 'true'
   process.env['INPUT_SKIP_CLONE'] = String(quick)
+  process.env['INPUT_IGNORE_FAILING'] = 'false'
+
   await run()
-})
+}, 60000)
+
+test('run as child process', () => {
+    process.env['INPUT_CHECKOUT_DIR'] = 'lingua-franca'
+    process.env['INPUT_COMPILER_REF'] = 'master'
+    process.env['INPUT_DELETE_IF_EXISTS'] = 'true'
+    process.env['INPUT_SKIP_CLONE'] = String(quick)
+    process.env['INPUT_IGNORE_FAILING'] = 'true'
+    const np = process.execPath
+    const ip = path.join(__dirname, '..', 'lib', 'main.js')
+    const options: cp.ExecFileSyncOptions = {
+      env: process.env
+    }
+    console.log(cp.execFileSync(np, [ip], options).toString())
+  })
+  

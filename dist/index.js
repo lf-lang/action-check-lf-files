@@ -117,17 +117,23 @@ const core = __importStar(__nccwpck_require__(2186));
 const readdir = (0, util_1.promisify)(fs.readdir);
 const lstat = (0, util_1.promisify)(fs.lstat);
 const exec = (0, util_1.promisify)(child_process.exec);
-const ignore = [core.getInput('checkout_dir'), 'node_modules']; //, 'failing']
-function checkAll(dir) {
+const skipDirs = [core.getInput('checkout_dir'), 'node_modules', 'src-gen'];
+function skipDir(dirName, skipFailed) {
+    if (skipDirs.includes(dirName) || (skipFailed && dirName.includes('fail'))) {
+        return true;
+    }
+    return false;
+}
+function checkAll(dir, ignore) {
     return __awaiter(this, void 0, void 0, function* () {
         let passed = true;
         const files = yield readdir(dir);
         for (const fileName of files) {
             const filePath = `${dir}/${fileName}`;
             const fileStats = yield lstat(filePath);
-            if (fileStats.isDirectory() && !ignore.includes(fileName)) {
+            if (fileStats.isDirectory() && skipDir(fileName, ignore)) {
                 // Recursively traverse subdirectories
-                passed = (yield checkAll(filePath)) && passed;
+                passed = (yield checkAll(filePath, ignore)) && passed;
             }
             else if (fileName.endsWith('.lf')) {
                 // Invoke command on file
@@ -187,6 +193,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const build_1 = __nccwpck_require__(982);
 const check_1 = __nccwpck_require__(7657);
@@ -197,6 +204,7 @@ function run() {
             const dir = core.getInput('checkout_dir');
             const del = !!core.getInput('delete_if_exists');
             const skip = !!core.getInput('skip_clone');
+            const ignore = !!core.getInput('ignore_failing');
             if (skip) {
                 core.info(`Using existing clone of the Lingua Franca repository in directory '${dir}'`);
             }
@@ -212,7 +220,7 @@ function run() {
             (0, build_1.configurePath)(dir);
             //core.info(`PATH: ${process.env.PATH}`)
             core.info('Checking all Lingua Franca files:');
-            if ((yield (0, check_1.checkAll)('.')) === false) {
+            if ((yield (0, check_1.checkAll)('.', ignore)) === false) {
                 core.setFailed('One or more tests failed to compile');
             }
         }
@@ -222,7 +230,9 @@ function run() {
         }
     });
 }
-run();
+exports.run = run;
+if (process.env['NODE_ENV'] !== 'test')
+    run();
 
 
 /***/ }),

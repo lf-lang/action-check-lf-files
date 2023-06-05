@@ -8,6 +8,7 @@ export async function run(): Promise<void> {
     const dir: string = core.getInput('checkout_dir')
     const del = !!core.getInput('delete_if_exists')
     const skip = !!core.getInput('skip_clone')
+    const ignore = !!core.getInput('ignore_failing')
 
     if (skip) {
       core.info(
@@ -30,7 +31,7 @@ export async function run(): Promise<void> {
     //core.info(`PATH: ${process.env.PATH}`)
 
     core.info('Checking all Lingua Franca files:')
-    if ((await checkAll('.')) === false) {
+    if ((await checkAll('.', ignore)) === false) {
       core.setFailed('One or more tests failed to compile')
     }
   } catch (error) {
@@ -38,4 +39,4 @@ export async function run(): Promise<void> {
   }
 }
 
-if (process.env['NODE_ENV'] != 'test') run()
+if (process.env['NODE_ENV'] !== 'test') run()
