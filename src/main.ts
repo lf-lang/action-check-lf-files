@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import {configurePath, deleteIfExists, clone, build} from './build'
-import {check} from './check'
+import {checkAll} from './check'
 
 async function run(): Promise<void> {
   try {
@@ -23,14 +23,14 @@ async function run(): Promise<void> {
       await clone(ref, dir)
     }
 
-    core.info('Building the Lingua Franca compiler')
+    core.info('Building the Lingua Franca compiler...')
     await build(dir)
 
     configurePath(dir)
     //core.info(`PATH: ${process.env.PATH}`)
 
-    core.info('Checking all Lingua Franca files')
-    if ((await check('.')) === false) {
+    core.info('Checking all Lingua Franca files:')
+    if ((await checkAll('.')) === false) {
       core.setFailed('One or more tests failed to compile')
     }
   } catch (error) {

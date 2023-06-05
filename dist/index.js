@@ -109,7 +109,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.check = void 0;
+exports.checkAll = void 0;
 const fs = __importStar(__nccwpck_require__(7147));
 const child_process = __importStar(__nccwpck_require__(2081));
 const util_1 = __nccwpck_require__(3837);
@@ -117,8 +117,8 @@ const core = __importStar(__nccwpck_require__(2186));
 const readdir = (0, util_1.promisify)(fs.readdir);
 const lstat = (0, util_1.promisify)(fs.lstat);
 const exec = (0, util_1.promisify)(child_process.exec);
-const ignore = [core.getInput('checkout_dir'), 'node_modules'];
-function check(dir) {
+const ignore = [core.getInput('checkout_dir'), 'node_modules']; //, 'failing']
+function checkAll(dir) {
     return __awaiter(this, void 0, void 0, function* () {
         let passed = true;
         const files = yield readdir(dir);
@@ -127,13 +127,13 @@ function check(dir) {
             const fileStats = yield lstat(filePath);
             if (fileStats.isDirectory() && !ignore.includes(fileName)) {
                 // Recursively traverse subdirectories
-                passed = (yield check(filePath)) && passed;
+                passed = (yield checkAll(filePath)) && passed;
             }
             else if (fileName.endsWith('.lf')) {
                 // Invoke command on file
                 try {
                     yield exec(`lfc "${filePath}"`);
-                    core.info(`✓ ${filePath}`);
+                    core.info(`✔️ ${filePath}`);
                 }
                 catch (error) {
                     core.error(`❌ ${filePath} (compilation failed)`);
@@ -144,7 +144,7 @@ function check(dir) {
         return passed;
     });
 }
-exports.check = check;
+exports.checkAll = checkAll;
 
 
 /***/ }),
@@ -207,12 +207,12 @@ function run() {
                 core.info(`Cloning the Lingua Franca repository (${ref}) into directory '${dir}'`);
                 yield (0, build_1.clone)(ref, dir);
             }
-            core.info('Building the Lingua Franca compiler');
+            core.info('Building the Lingua Franca compiler...');
             yield (0, build_1.build)(dir);
             (0, build_1.configurePath)(dir);
             //core.info(`PATH: ${process.env.PATH}`)
-            core.info('Checking all Lingua Franca files');
-            if ((yield (0, check_1.check)('.')) === false) {
+            core.info('Checking all Lingua Franca files:');
+            if ((yield (0, check_1.checkAll)('.')) === false) {
                 core.setFailed('One or more tests failed to compile');
             }
         }
