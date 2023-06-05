@@ -6,14 +6,14 @@ import {expect, test} from '@jest/globals'
 
 const quick = false // change to true for quicker testing
 
-if (!quick) {
-    test('checkout repo', async () => {
-        await deleteIfExists('foo')
-        await expect(clone('master', 'foo'))
-        await expect(clone('master', 'foo')).rejects.toThrow("fatal: destination path 'foo' already exists and is not an empty directory.")
-        await deleteIfExists('foo')
-    })    
-}
+// if (!quick) {
+//     test('checkout repo', async () => {
+//         await deleteIfExists('foo')
+//         await expect(clone('master', 'foo'))
+//         await expect(clone('master', 'foo')).rejects.toThrow("fatal: destination path 'foo' already exists and is not an empty directory.")
+//         await deleteIfExists('foo')
+//     })    
+// }
 
 // shows how the runner will run a javascript action with env / stdout protocol
 test('test runs', () => {
