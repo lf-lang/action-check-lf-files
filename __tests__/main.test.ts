@@ -4,7 +4,7 @@ import * as cp from 'child_process'
 import * as path from 'path'
 import {expect, test} from '@jest/globals'
 
-//const quick = true // uncomment for quicker testing
+const quick = false // change to true for quicker testing
 
 if (!quick) {
     test('checkout repo', async () => {
