@@ -109,7 +109,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.checkAll = void 0;
+exports.checkAll = exports.skipDirs = void 0;
 const fs = __importStar(__nccwpck_require__(7147));
 const child_process = __importStar(__nccwpck_require__(2081));
 const util_1 = __nccwpck_require__(3837);
@@ -117,9 +117,9 @@ const core = __importStar(__nccwpck_require__(2186));
 const readdir = (0, util_1.promisify)(fs.readdir);
 const lstat = (0, util_1.promisify)(fs.lstat);
 const exec = (0, util_1.promisify)(child_process.exec);
-const skipDirs = [core.getInput('checkout_dir'), 'node_modules', 'src-gen'];
+exports.skipDirs = ['node_modules', 'src-gen', 'gh-action-test-0', 'gh-action-test-1'];
 function skipDir(dirName, skipFailed) {
-    if (skipDirs.includes(dirName) || (skipFailed && dirName.includes('fail'))) {
+    if (exports.skipDirs.includes(dirName) || (skipFailed && dirName.includes('fail'))) {
         return true;
     }
     return false;
@@ -131,9 +131,11 @@ function checkAll(dir, ignore) {
         for (const fileName of files) {
             const filePath = `${dir}/${fileName}`;
             const fileStats = yield lstat(filePath);
-            if (fileStats.isDirectory() && skipDir(fileName, ignore)) {
+            if (fileStats.isDirectory()) {
                 // Recursively traverse subdirectories
-                passed = (yield checkAll(filePath, ignore)) && passed;
+                if (!skipDir(fileName, ignore)) {
+                    passed = (yield checkAll(filePath, ignore)) && passed;
+                }
             }
             else if (fileName.endsWith('.lf')) {
                 // Invoke command on file
@@ -203,8 +205,10 @@ function run() {
             const ref = core.getInput('compiler_ref');
             const dir = core.getInput('checkout_dir');
             const del = !!core.getInput('delete_if_exists');
-            const skip = !!core.getInput('skip_clone');
-            const ignore = !!core.getInput('ignore_failing');
+            //const skip = !!core.getInput('skip_clone')
+            const skip = core.getInput('skip_clone') === 'true';
+            //const ignore = !!core.getInput('ignore_failing')
+            const ignore = core.getInput('ignore_failing') === 'true';
             if (skip) {
                 core.info(`Using existing clone of the Lingua Franca repository in directory '${dir}'`);
             }
@@ -218,8 +222,8 @@ function run() {
             core.info('Building the Lingua Franca compiler...');
             yield (0, build_1.build)(dir);
             (0, build_1.configurePath)(dir);
-            //core.info(`PATH: ${process.env.PATH}`)
             core.info('Checking all Lingua Franca files:');
+            check_1.skipDirs.push(dir);
             if ((yield (0, check_1.checkAll)('.', ignore)) === false) {
                 core.setFailed('One or more tests failed to compile');
             }
@@ -231,7 +235,7 @@ function run() {
     });
 }
 exports.run = run;
-if (process.env['NODE_ENV'] !== 'test')
+if (process.env['NODE_ENV'] !== 'test' || process.env['GH_ACTIONS'] === 'true')
     run();
 
 

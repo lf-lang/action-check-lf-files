@@ -1,14 +1,14 @@
 import * as core from '@actions/core'
 import {configurePath, deleteIfExists, clone, build} from './build'
-import {checkAll} from './check'
+import {skipDirs, checkAll} from './check'
 
 export async function run(): Promise<void> {
   try {
-    const ref: string = core.getInput('compiler_ref')
-    const dir: string = core.getInput('checkout_dir')
-    const del = !!core.getInput('delete_if_exists')
-    const skip = !!core.getInput('skip_clone')
-    const ignore = !!core.getInput('ignore_failing')
+    const ref = core.getInput('compiler_ref')
+    const dir = core.getInput('checkout_dir')
+    const del = core.getInput('delete_if_exists') === 'true'
+    const skip = core.getInput('skip_clone') === 'true'
+    const ignore = core.getInput('ignore_failing') === 'true'
 
     if (skip) {
       core.info(
@@ -28,9 +28,9 @@ export async function run(): Promise<void> {
     await build(dir)
 
     configurePath(dir)
-    //core.info(`PATH: ${process.env.PATH}`)
 
     core.info('Checking all Lingua Franca files:')
+    skipDirs.push(dir)
     if ((await checkAll('.', ignore)) === false) {
       core.setFailed('One or more tests failed to compile')
     }
@@ -39,4 +39,5 @@ export async function run(): Promise<void> {
   }
 }
 
-if (process.env['NODE_ENV'] !== 'test') run()
+if (process.env['NODE_ENV'] !== 'test' || process.env['GH_ACTIONS'] === 'true')
+  run()
