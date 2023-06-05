@@ -1,26 +1,32 @@
 import * as core from '@actions/core'
-import {simpleGit} from 'simple-git'
+import {configurePath, deleteIfExists, clone, build} from './build'
+import {check} from './check'
 
 async function run(): Promise<void> {
   try {
-    const ref: string = core.getInput('compiler-ref')
-    const dir: string = core.getInput('checkout-dir')
-    const git = simpleGit()
-    git.clone('git@github.com:lf-lang/lingua-franca.git', dir)
-    git.checkoutLocalBranch(ref) // FIXME: how to point it to the right directory?
+    const ref: string = core.getInput('compiler_ref')
+    const dir: string = core.getInput('checkout_dir')
+    const del = !!core.getInput('delete_if_exists')
 
-    // Build compiler and set command
-    
-    // Traverse tree
+    if (del) {
+      await deleteIfExists(dir)
+    }
 
+    core.info(
+      `Cloning the Lingua Franca repository (${ref}) into directory '${dir}'`
+    )
+    await clone(ref, dir)
 
-    // core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    core.info('Building the Lingua Franca compiler')
+    await build(dir)
 
-    // core.debug(new Date().toTimeString())
-    // await wait(parseInt(ms, 10))
-    // core.debug(new Date().toTimeString())
+    configurePath(dir)
+    //core.info(`PATH: ${process.env.PATH}`)
 
-    // core.setOutput('time', new Date().toTimeString())
+    core.info('Checking all Lingua Franca files')
+    if ((await check('.')) === false) {
+      core.setFailed('One or more tests failed to compile')
+    }
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
