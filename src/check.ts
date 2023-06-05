@@ -7,6 +7,8 @@ const readdir = promisify(fs.readdir)
 const lstat = promisify(fs.lstat)
 const exec = promisify(child_process.exec)
 
+const ignore = [core.getInput('checkout_dir'), 'node_modules']
+
 export async function check(dir: string): Promise<boolean> {
   let passed = true
 
@@ -16,16 +18,16 @@ export async function check(dir: string): Promise<boolean> {
     const filePath = `${dir}/${fileName}`
     const fileStats = await lstat(filePath)
 
-    if (fileStats.isDirectory() && fileName !== 'lingua-franca') {
+    if (fileStats.isDirectory() && !ignore.includes(fileName)) {
       // Recursively traverse subdirectories
       passed = (await check(filePath)) && passed
     } else if (fileName.endsWith('.lf')) {
       // Invoke command on file
       try {
         await exec(`lfc "${filePath}"`)
-        core.info(`✅ ${filePath}`)
+        core.info(`✓ ${filePath}`)
       } catch (error) {
-        core.error(`❌ ${filePath}`)
+        core.error(`❌ ${filePath} (compilation failed)`)
         passed = false
       }
     }

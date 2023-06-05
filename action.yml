@@ -14,6 +14,10 @@ inputs:
     required: false
     description: 'Delete the checkout directory if it exists prior to cloning'
     default: false
+  skip_clone:
+    required: false
+    description: 'Use existing clone of lingua-franca'
+    default: false
 runs:
   using: 'node16'
   main: 'dist/index.js'

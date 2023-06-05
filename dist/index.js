@@ -117,6 +117,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const readdir = (0, util_1.promisify)(fs.readdir);
 const lstat = (0, util_1.promisify)(fs.lstat);
 const exec = (0, util_1.promisify)(child_process.exec);
+const ignore = [core.getInput('checkout_dir'), 'node_modules'];
 function check(dir) {
     return __awaiter(this, void 0, void 0, function* () {
         let passed = true;
@@ -124,7 +125,7 @@ function check(dir) {
         for (const fileName of files) {
             const filePath = `${dir}/${fileName}`;
             const fileStats = yield lstat(filePath);
-            if (fileStats.isDirectory() && fileName !== 'lingua-franca') {
+            if (fileStats.isDirectory() && !ignore.includes(fileName)) {
                 // Recursively traverse subdirectories
                 passed = (yield check(filePath)) && passed;
             }
@@ -132,10 +133,10 @@ function check(dir) {
                 // Invoke command on file
                 try {
                     yield exec(`lfc "${filePath}"`);
-                    core.info(`✅ ${filePath}`);
+                    core.info(`✓ ${filePath}`);
                 }
                 catch (error) {
-                    core.error(`❌ ${filePath}`);
+                    core.error(`❌ ${filePath} (compilation failed)`);
                     passed = false;
                 }
             }
@@ -195,11 +196,17 @@ function run() {
             const ref = core.getInput('compiler_ref');
             const dir = core.getInput('checkout_dir');
             const del = !!core.getInput('delete_if_exists');
-            if (del) {
-                yield (0, build_1.deleteIfExists)(dir);
+            const skip = !!core.getInput('skip_clone');
+            if (skip) {
+                core.info(`Using existing clone of the Lingua Franca repository in directory '${dir}'`);
             }
-            core.info(`Cloning the Lingua Franca repository (${ref}) into directory '${dir}'`);
-            yield (0, build_1.clone)(ref, dir);
+            else {
+                if (del) {
+                    yield (0, build_1.deleteIfExists)(dir);
+                }
+                core.info(`Cloning the Lingua Franca repository (${ref}) into directory '${dir}'`);
+                yield (0, build_1.clone)(ref, dir);
+            }
             core.info('Building the Lingua Franca compiler');
             yield (0, build_1.build)(dir);
             (0, build_1.configurePath)(dir);

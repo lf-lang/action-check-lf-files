@@ -7,15 +7,21 @@ async function run(): Promise<void> {
     const ref: string = core.getInput('compiler_ref')
     const dir: string = core.getInput('checkout_dir')
     const del = !!core.getInput('delete_if_exists')
+    const skip = !!core.getInput('skip_clone')
 
-    if (del) {
-      await deleteIfExists(dir)
+    if (skip) {
+      core.info(
+        `Using existing clone of the Lingua Franca repository in directory '${dir}'`
+      )
+    } else {
+      if (del) {
+        await deleteIfExists(dir)
+      }
+      core.info(
+        `Cloning the Lingua Franca repository (${ref}) into directory '${dir}'`
+      )
+      await clone(ref, dir)
     }
-
-    core.info(
-      `Cloning the Lingua Franca repository (${ref}) into directory '${dir}'`
-    )
-    await clone(ref, dir)
 
     core.info('Building the Lingua Franca compiler')
     await build(dir)
