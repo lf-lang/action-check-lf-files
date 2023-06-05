@@ -204,10 +204,8 @@ function run() {
         try {
             const ref = core.getInput('compiler_ref');
             const dir = core.getInput('checkout_dir');
-            const del = !!core.getInput('delete_if_exists');
-            //const skip = !!core.getInput('skip_clone')
+            const del = core.getInput('delete_if_exists') === 'true';
             const skip = core.getInput('skip_clone') === 'true';
-            //const ignore = !!core.getInput('ignore_failing')
             const ignore = core.getInput('ignore_failing') === 'true';
             if (skip) {
                 core.info(`Using existing clone of the Lingua Franca repository in directory '${dir}'`);
