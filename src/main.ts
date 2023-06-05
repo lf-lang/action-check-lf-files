@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import {configurePath, deleteIfExists, clone, build} from './build'
 import {checkAll} from './check'
 
-async function run(): Promise<void> {
+export async function run(): Promise<void> {
   try {
     const ref: string = core.getInput('compiler_ref')
     const dir: string = core.getInput('checkout_dir')
@@ -38,4 +38,4 @@ async function run(): Promise<void> {
   }
 }
 
-run()
+if (process.env['NODE_ENV'] != 'test') run()
