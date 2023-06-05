@@ -27,7 +27,7 @@ export async function checkAll(dir: string): Promise<boolean> {
         await exec(`lfc "${filePath}"`)
         core.info(`✔️ ${filePath}`)
       } catch (error) {
-        core.error(`❌ ${filePath} (compilation failed)`)
+        core.info(`❌ ${filePath} (compilation failed)`)
         passed = false
       }
     }

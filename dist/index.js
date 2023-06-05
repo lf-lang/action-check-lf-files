@@ -136,7 +136,7 @@ function checkAll(dir) {
                     core.info(`✔️ ${filePath}`);
                 }
                 catch (error) {
-                    core.error(`❌ ${filePath} (compilation failed)`);
+                    core.info(`❌ ${filePath} (compilation failed)`);
                     passed = false;
                 }
             }
