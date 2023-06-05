@@ -39,22 +39,111 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.build = exports.clone = void 0;
+exports.configurePath = exports.build = exports.clone = exports.deleteIfExists = void 0;
 const simple_git_1 = __nccwpck_require__(9103);
 const cp = __importStar(__nccwpck_require__(2081));
+const promises_1 = __nccwpck_require__(3977);
+const path = __importStar(__nccwpck_require__(9411));
+function deleteIfExists(dir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return (0, promises_1.rm)(dir, { recursive: true, force: true });
+    });
+}
+exports.deleteIfExists = deleteIfExists;
 function clone(ref, dir) {
     return __awaiter(this, void 0, void 0, function* () {
         const git = (0, simple_git_1.simpleGit)();
-        yield git.clone('git@github.com:lf-lang/lingua-franca.git', dir);
+        yield git.clone('https://github.com/lf-lang/lingua-franca.git', dir);
     });
 }
 exports.clone = clone;
 function build(dir) {
     return __awaiter(this, void 0, void 0, function* () {
-        cp.exec('./gradlew clean buildAll', { cwd: dir });
+        cp.exec('./gradlew assemble', { cwd: dir });
     });
 }
 exports.build = build;
+function configurePath(dir) {
+    process.env.PATH = `${process.env.PATH}:${path.join(path.resolve(dir), 'bin')}`;
+}
+exports.configurePath = configurePath;
+
+
+/***/ }),
+
+/***/ 7657:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.check = void 0;
+const fs = __importStar(__nccwpck_require__(7147));
+const child_process = __importStar(__nccwpck_require__(2081));
+const util_1 = __nccwpck_require__(3837);
+const core = __importStar(__nccwpck_require__(2186));
+const readdir = (0, util_1.promisify)(fs.readdir);
+const lstat = (0, util_1.promisify)(fs.lstat);
+const exec = (0, util_1.promisify)(child_process.exec);
+function check(dir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let passed = true;
+        const files = yield readdir(dir);
+        for (const fileName of files) {
+            const filePath = `${dir}/${fileName}`;
+            const fileStats = yield lstat(filePath);
+            if (fileStats.isDirectory() && fileName !== 'lingua-franca') {
+                // Recursively traverse subdirectories
+                passed = (yield check(filePath)) && passed;
+            }
+            else if (fileName.endsWith('.lf')) {
+                // Invoke command on file
+                try {
+                    yield exec(`lfc "${filePath}"`);
+                    core.info(`✅ ${filePath}`);
+                }
+                catch (error) {
+                    core.error(`❌ ${filePath}`);
+                    passed = false;
+                }
+            }
+        }
+        return passed;
+    });
+}
+exports.check = check;
 
 
 /***/ }),
@@ -99,25 +188,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const build_1 = __nccwpck_require__(982);
+const check_1 = __nccwpck_require__(7657);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        return new Promise(resolve => {
-            try {
-                const ref = core.getInput('compiler-ref');
-                const dir = core.getInput('checkout-dir');
-                core.info(`Cloning the Lingua Franca repository (${ref}) into ${dir}`);
-                (0, build_1.clone)(ref, dir);
-                core.info('Building the Lingua Franca compiler');
-                //build(dir)
-                core.info('Checking all Lingua Franca files');
-                // check(path, cmd)
+        try {
+            const ref = core.getInput('compiler_ref');
+            const dir = core.getInput('checkout_dir');
+            const del = !!core.getInput('delete_if_exists');
+            if (del) {
+                yield (0, build_1.deleteIfExists)(dir);
             }
-            catch (error) {
-                if (error instanceof Error)
-                    core.setFailed(error.message);
+            core.info(`Cloning the Lingua Franca repository (${ref}) into directory '${dir}'`);
+            yield (0, build_1.clone)(ref, dir);
+            core.info('Building the Lingua Franca compiler');
+            yield (0, build_1.build)(dir);
+            (0, build_1.configurePath)(dir);
+            //core.info(`PATH: ${process.env.PATH}`)
+            core.info('Checking all Lingua Franca files');
+            if ((yield (0, check_1.check)('.')) === false) {
+                core.setFailed('One or more tests failed to compile');
             }
-            resolve('done!');
-        });
+        }
+        catch (error) {
+            if (error instanceof Error)
+                core.setFailed(error.message);
+        }
     });
 }
 run();
@@ -8398,6 +8493,22 @@ module.exports = require("https");
 
 "use strict";
 module.exports = require("net");
+
+/***/ }),
+
+/***/ 3977:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:fs/promises");
+
+/***/ }),
+
+/***/ 9411:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:path");
 
 /***/ }),
 
