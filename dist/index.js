@@ -61,7 +61,7 @@ function clone(ref, dir) {
 exports.clone = clone;
 function build(dir) {
     return __awaiter(this, void 0, void 0, function* () {
-        exec('./gradlew assemble', { cwd: dir });
+        exec('./gradlew clean assemble', { cwd: dir });
     });
 }
 exports.build = build;
