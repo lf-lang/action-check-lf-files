@@ -29,7 +29,7 @@ export async function run(softError = false): Promise<string> {
 
     core.info('Checking all Lingua Franca files:')
     skipDirs.push(dir)
-    if ((await checkAll(dir, '.', ignore)) === false) {
+    if ((await checkAll('.', ignore)) === false) {
       result = 'One or more tests failed to compile'
       if (!softError) {
         core.setFailed(result)

@@ -1,4 +1,3 @@
-import {simpleGit} from 'simple-git'
 import * as child_process from 'child_process'
 import {rm} from 'node:fs/promises'
 import * as path from 'node:path'
@@ -11,8 +10,8 @@ export async function deleteIfExists(dir: string): Promise<void> {
 }
 
 export async function clone(ref: string, dir: string): Promise<void> {
-  const git = simpleGit()
-  await git.clone('https://github.com/lf-lang/lingua-franca.git', dir)
+  await exec(`git clone https://github.com/lf-lang/lingua-franca.git ${dir}`)
+  await exec(`git checkout ${ref}`, {cwd: dir})
   await exec('git submodule update --init', {cwd: dir})
 }
 
