@@ -164,7 +164,7 @@ function checkAll(lfDir, dir, ignore) {
                     const options = {
                         env: process.env
                     };
-                    yield run(`${lfDir}/bin/lfc "${filePath}"`, options);
+                    yield run(`lfc "${filePath}"`, options);
                     core.info(`✔️ ${filePath}`);
                 }
                 catch (error) {
