@@ -7,7 +7,7 @@ on: # rebuild any PRs and main branch changes
       - 'releases/*'
 
 jobs:
-  prepare:
+  build: # make sure build/ci work properly
     runs-on: ubuntu-latest
     steps:
       - name: Set up Java 17
@@ -16,18 +16,19 @@ jobs:
           echo "org.gradle.java.home=${JAVA_HOME_17_X64//\\/\/}" >> gradle.properties
           echo "JAVA_HOME=$JAVA_HOME_17_X64" >> $GITHUB_ENV
         shell: bash
-  build: # make sure build/ci work properly
-    runs-on: ubuntu-latest
-    steps:
       - uses: actions/checkout@v3
       - run: |
           npm install
       - run: |
           npm run all
-    needs: prepare
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Java 17
+        run: |
+          echo "$JAVA_HOME_17_X64/bin" >> $GITHUB_PATH
+          echo "org.gradle.java.home=${JAVA_HOME_17_X64//\\/\/}" >> gradle.properties
+          echo "JAVA_HOME=$JAVA_HOME_17_X64" >> $GITHUB_ENV
+        shell: bash
       - uses: actions/checkout@v3
       - uses: ./
-    needs: prepare
