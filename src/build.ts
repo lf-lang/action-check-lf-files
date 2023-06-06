@@ -30,10 +30,10 @@ export async function clone(ref: string, dir: string): Promise<void> {
 
 export async function build(dir: string): Promise<void> {
   const dir_up = `${dir}/..`
-  await exec('ls -la', {cwd: dir}, stdout: (data: Buffer) => { myOutput += data.toString(); }, stderr: (data: Buffer) => { myError += data.toString(); })
+  await exec('ls -la', {cwd: dir, stdout: (data: Buffer) => { myOutput += data.toString(); }, stderr: (data: Buffer) => { myError += data.toString(); }})
   console.log(myOutput);
   console.log(myError);
-  await exec('ls -la', {cwd: dir_u,p})
+  await exec('ls -la', {cwd: dir_up, stdout: (data: Buffer) => { myOutput += data.toString(); }, stderr: (data: Buffer) => { myError += data.toString(); }})
   myOutput = ''
   myError = ''
   console.log(myOutput);
