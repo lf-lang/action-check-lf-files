@@ -113,12 +113,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.checkAll = exports.skipDirs = void 0;
 const fs = __importStar(__nccwpck_require__(7147));
-const child_process = __importStar(__nccwpck_require__(2081));
+const cp = __importStar(__nccwpck_require__(2081));
 const util_1 = __nccwpck_require__(3837);
 const core = __importStar(__nccwpck_require__(2186));
 const readdir = (0, util_1.promisify)(fs.readdir);
 const lstat = (0, util_1.promisify)(fs.lstat);
-const exec = (0, util_1.promisify)(child_process.exec);
 exports.skipDirs = [
     'node_modules',
     'src-gen',
@@ -126,6 +125,19 @@ exports.skipDirs = [
     'gh-action-test-1',
     'gh-action-test-2'
 ];
+function run(cmd, options) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return new Promise((resolve, reject) => {
+            cp.exec(cmd, options, (error, stdout, stderr) => {
+                if (error)
+                    return reject(error);
+                if (stderr)
+                    return reject(stderr);
+                resolve(stdout);
+            });
+        });
+    });
+}
 function skipDir(dirName, skipFailed) {
     if (exports.skipDirs.includes(dirName) || (skipFailed && dirName.includes('fail'))) {
         return true;
@@ -148,7 +160,10 @@ function checkAll(dir, ignore) {
             else if (fileName.endsWith('.lf')) {
                 // Invoke command on file
                 try {
-                    yield exec(`lfc "${filePath}"`);
+                    const options = {
+                        env: process.env
+                    };
+                    yield run(`lfc "${filePath}"`, options);
                     core.info(`✔️ ${filePath}`);
                 }
                 catch (error) {

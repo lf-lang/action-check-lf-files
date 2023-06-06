@@ -4,7 +4,6 @@ import * as cp from 'child_process'
 import * as path from 'path'
 import {expect, test} from '@jest/globals'
 import {run} from '../src/main'
-import * as core from '@actions/core'
 
 const quick = false // change to true for quicker testing
 
