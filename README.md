@@ -15,7 +15,7 @@ This GitHub action recursively visits a given `search_dir`, finds every `.lf` fi
     compiler_ref: 'master'                          # Which version of the compiler to use
     delete_if_exists: false                         # Delete if `checkout_dir` already exists
     exclude_dirs: '["failing", "experimental"]'     # JSON array of directories not to visit
-    no_compile_flag: false                          # Run lfc with --no-compile flag if true
+    no_compile_flag: false                          # Run lfc with `--no-compile` flag if true
     skip_clone: false                               # Use an existing clone of `lingua-franca`
     search_dir: '.'                                 # Where to start looking for `.lf` files
 ```
