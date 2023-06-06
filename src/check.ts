@@ -36,6 +36,7 @@ export async function checkAll(
         core.info(`✔️ ${filePath}`)
       } catch (error) {
         core.info(`❌ ${filePath} (compilation failed)`)
+        core.error(String(error))
         passed = false
       }
     }

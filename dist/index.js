@@ -144,6 +144,7 @@ function checkAll(dir, noCompile) {
                 }
                 catch (error) {
                     core.info(`❌ ${filePath} (compilation failed)`);
+                    core.error(String(error));
                     passed = false;
                 }
             }
