@@ -18,18 +18,18 @@ inputs:
     required: false
     description: 'JSON array of directories not to visit'
     default: '["failing"]'
-  search_dir:
-    required: false
-    description: 'Starting point of traversal to find LF files'
-    default: '.'
-  skip_clone:
-    required: false
-    description: 'Use existing clone of lingua-franca'
-    default: false
   no_compile_flag:
     required: false
     description: 'Run lfc with --no-compile flag if true'
     default: false
+  skip_clone:
+    required: false
+    description: 'Use existing clone of lingua-franca'
+    default: false
+  search_dir:
+    required: false
+    description: 'Starting point of traversal to find LF files'
+    default: '.'
   
 runs:
   using: 'node16'
