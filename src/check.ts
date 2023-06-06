@@ -7,22 +7,13 @@ const readdir = promisify(fs.readdir)
 const lstat = promisify(fs.lstat)
 const exec = promisify(cp.exec)
 
-export const skipDirs = [
-  'node_modules',
-  'src-gen',
-  'gh-action-test-0',
-  'gh-action-test-1',
-  'gh-action-test-2'
-]
+// FIXME: allow wildcards?
+export const skipDirs = ['node_modules', 'src-gen', 'fed-gen']
 
-function skipDir(dirName: string, skipFailed: boolean): boolean {
-  if (skipDirs.includes(dirName) || (skipFailed && dirName.includes('fail'))) {
-    return true
-  }
-  return false
-}
-
-export async function checkAll(dir: string, ignore: boolean): Promise<boolean> {
+export async function checkAll(
+  dir: string,
+  noCompile: boolean
+): Promise<boolean> {
   let passed = true
 
   const files = await readdir(dir)
@@ -33,13 +24,15 @@ export async function checkAll(dir: string, ignore: boolean): Promise<boolean> {
 
     if (fileStats.isDirectory()) {
       // Recursively traverse subdirectories
-      if (!skipDir(fileName, ignore)) {
-        passed = (await checkAll(filePath, ignore)) && passed
+      if (!skipDirs.includes(fileName)) {
+        passed = (await checkAll(filePath, noCompile)) && passed
       }
     } else if (fileName.endsWith('.lf')) {
       // Invoke command on file
       try {
-        await exec(`lfc "${filePath}"`, {env: process.env})
+        await exec(`lfc ${noCompile ? '--no-compile' : ''} "${filePath}"`, {
+          env: process.env
+        })
         core.info(`✔️ ${filePath}`)
       } catch (error) {
         core.info(`❌ ${filePath} (compilation failed)`)

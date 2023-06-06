@@ -119,20 +119,9 @@ const core = __importStar(__nccwpck_require__(186));
 const readdir = (0, util_1.promisify)(fs.readdir);
 const lstat = (0, util_1.promisify)(fs.lstat);
 const exec = (0, util_1.promisify)(cp.exec);
-exports.skipDirs = [
-    'node_modules',
-    'src-gen',
-    'gh-action-test-0',
-    'gh-action-test-1',
-    'gh-action-test-2'
-];
-function skipDir(dirName, skipFailed) {
-    if (exports.skipDirs.includes(dirName) || (skipFailed && dirName.includes('fail'))) {
-        return true;
-    }
-    return false;
-}
-function checkAll(dir, ignore) {
+// FIXME: allow wildcards?
+exports.skipDirs = ['node_modules', 'src-gen', 'fed-gen'];
+function checkAll(dir, noCompile) {
     return __awaiter(this, void 0, void 0, function* () {
         let passed = true;
         const files = yield readdir(dir);
@@ -141,14 +130,16 @@ function checkAll(dir, ignore) {
             const fileStats = yield lstat(filePath);
             if (fileStats.isDirectory()) {
                 // Recursively traverse subdirectories
-                if (!skipDir(fileName, ignore)) {
-                    passed = (yield checkAll(filePath, ignore)) && passed;
+                if (!exports.skipDirs.includes(fileName)) {
+                    passed = (yield checkAll(filePath, noCompile)) && passed;
                 }
             }
             else if (fileName.endsWith('.lf')) {
                 // Invoke command on file
                 try {
-                    yield exec(`lfc "${filePath}"`, { env: process.env });
+                    yield exec(`lfc ${noCompile ? '--no-compile' : ''} "${filePath}"`, {
+                        env: process.env
+                    });
                     core.info(`✔️ ${filePath}`);
                 }
                 catch (error) {
@@ -211,13 +202,15 @@ function run(softError = false) {
     return __awaiter(this, void 0, void 0, function* () {
         let result = 'Success';
         const dir = core.getInput('checkout_dir');
+        const excludes = JSON.parse(core.getInput('exclude_dirs'));
+        const ref = core.getInput('compiler_ref');
+        const del = core.getInput('delete_if_exists') === 'true';
+        const noCompile = core.getInput('no-compile-flag') === 'true';
+        const skip = core.getInput('skip_clone') === 'true';
+        const searchDir = core.getInput('search_dir');
         try {
-            const ref = core.getInput('compiler_ref');
-            const del = core.getInput('delete_if_exists') === 'true';
-            const skip = core.getInput('skip_clone') === 'true';
-            const ignore = core.getInput('ignore_failing') === 'true';
             if (skip) {
-                core.info(`Using existing clone of the Lingua Franca repository in directory '${dir}'`);
+                core.info(`Using existing clone of the Lingua Franca repository in directory '${dir}'...`);
             }
             else {
                 if (del) {
@@ -229,7 +222,10 @@ function run(softError = false) {
             (0, build_1.configurePath)(dir);
             core.info('Checking all Lingua Franca files:');
             check_1.skipDirs.push(dir);
-            if ((yield (0, check_1.checkAll)('.', ignore)) === false) {
+            for (const exclude of excludes) {
+                check_1.skipDirs.push(exclude);
+            }
+            if ((yield (0, check_1.checkAll)(searchDir, noCompile)) === false) {
                 result = 'One or more tests failed to compile';
                 if (!softError) {
                     core.setFailed(result);
@@ -253,6 +249,8 @@ exports.run = run;
 // explicitly to signal that we _do_ want to invoke run.
 if (process.env['NODE_ENV'] !== 'test' || process.env['GH_ACTIONS'] === 'true')
     run();
+if (process.env['NODE_ENV'] === 'test')
+    check_1.skipDirs.push('gh-action-test-0', 'gh-action-test-1', 'gh-action-test-2');
 
 
 /***/ }),

@@ -5,15 +5,16 @@ import {skipDirs, checkAll} from './check'
 export async function run(softError = false): Promise<string> {
   let result = 'Success'
   const dir = core.getInput('checkout_dir')
+  const excludes: string[] = JSON.parse(core.getInput('exclude_dirs'))
+  const ref = core.getInput('compiler_ref')
+  const del = core.getInput('delete_if_exists') === 'true'
+  const noCompile = core.getInput('no-compile-flag') === 'true'
+  const skip = core.getInput('skip_clone') === 'true'
+  const searchDir = core.getInput('search_dir')
   try {
-    const ref = core.getInput('compiler_ref')
-    const del = core.getInput('delete_if_exists') === 'true'
-    const skip = core.getInput('skip_clone') === 'true'
-    const ignore = core.getInput('ignore_failing') === 'true'
-
     if (skip) {
       core.info(
-        `Using existing clone of the Lingua Franca repository in directory '${dir}'`
+        `Using existing clone of the Lingua Franca repository in directory '${dir}'...`
       )
     } else {
       if (del) {
@@ -29,7 +30,10 @@ export async function run(softError = false): Promise<string> {
 
     core.info('Checking all Lingua Franca files:')
     skipDirs.push(dir)
-    if ((await checkAll('.', ignore)) === false) {
+    for (const exclude of excludes) {
+      skipDirs.push(exclude)
+    }
+    if ((await checkAll(searchDir, noCompile)) === false) {
       result = 'One or more tests failed to compile'
       if (!softError) {
         core.setFailed(result)
@@ -49,3 +53,5 @@ export async function run(softError = false): Promise<string> {
 // explicitly to signal that we _do_ want to invoke run.
 if (process.env['NODE_ENV'] !== 'test' || process.env['GH_ACTIONS'] === 'true')
   run()
+if (process.env['NODE_ENV'] === 'test')
+  skipDirs.push('gh-action-test-0', 'gh-action-test-1', 'gh-action-test-2')

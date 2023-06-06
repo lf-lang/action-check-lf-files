@@ -2,26 +2,35 @@ name: 'Check Lingua Franca files'
 description: 'Ensure that all Lingua Franca files compile'
 author: 'Marten Lohstroh'
 inputs:
-  compiler_ref:
-    required: false
-    description: 'Ref of the compiler to check against'
-    default: 'master'
   checkout_dir:
     required: false
     description: 'The directory in which to check out the lingua-franca repo'
     default: 'lingua-franca'
+  compiler_ref:
+    required: false
+    description: 'Ref of the compiler to check against'
+    default: 'master'
   delete_if_exists:
     required: false
     description: 'Delete the checkout directory if it exists prior to cloning'
     default: false
+  exclude_dirs:
+    required: false
+    description: 'JSON array of directories to not visit'
+    default: '[]'
+  search_dir:
+    required: false
+    description: 'Starting point of traversal to find LF files'
+    default: '.'
   skip_clone:
     required: false
     description: 'Use existing clone of lingua-franca'
     default: false
-  ignore_failing:
+  no-compile-flag:
     required: false
-    description: 'Ignore files already marked as failing'
-    default: true
+    description: 'Run lfc with --no-compile flag if true'
+    default: false
+  
 runs:
   using: 'node16'
   main: 'dist/index.js'
