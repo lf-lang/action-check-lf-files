@@ -16,7 +16,7 @@ export async function clone(ref: string, dir: string): Promise<void> {
 }
 
 export async function build(dir: string): Promise<void> {
-  exec('./gradlew clean assemble', {cwd: dir})
+  exec('./gradlew assemble', {cwd: dir})
 }
 
 export function configurePath(dir: string): void {
