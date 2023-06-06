@@ -16,8 +16,9 @@ export async function clone(ref: string, dir: string): Promise<void> {
 }
 
 export async function build(dir: string): Promise<void> {
+  const dir_up = dir + "/.."
   exec('./ls -la', {cwd: dir})
-  exec('./ls -la', {cwd: dir + "/.."})
+  exec('./ls -la', {cwd: dir_up})
   exec('./gradlew clean assemble', {cwd: dir})
 }
 
