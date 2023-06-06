@@ -1,6 +1,170 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 982:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.configurePath = exports.gradleStop = exports.clone = exports.deleteIfExists = void 0;
+const child_process = __importStar(__nccwpck_require__(81));
+const promises_1 = __nccwpck_require__(977);
+const path = __importStar(__nccwpck_require__(411));
+const util_1 = __nccwpck_require__(837);
+const exec = (0, util_1.promisify)(child_process.exec);
+function deleteIfExists(dir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return (0, promises_1.rm)(dir, { recursive: true, force: true });
+    });
+}
+exports.deleteIfExists = deleteIfExists;
+function clone(ref, dir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield exec(`git clone https://github.com/lf-lang/lingua-franca.git ${dir}`);
+        yield exec(`git checkout ${ref}`, { cwd: dir });
+        yield exec('git submodule update --init', { cwd: dir });
+    });
+}
+exports.clone = clone;
+function gradleStop(dir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        exec('./gradlew --stop', { cwd: dir });
+    });
+}
+exports.gradleStop = gradleStop;
+function configurePath(dir) {
+    process.env.PATH = `${process.env.PATH}:${path.join(path.resolve(dir), 'bin')}`;
+}
+exports.configurePath = configurePath;
+
+
+/***/ }),
+
+/***/ 657:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.checkAll = exports.skipDirs = void 0;
+const fs = __importStar(__nccwpck_require__(147));
+const cp = __importStar(__nccwpck_require__(81));
+const util_1 = __nccwpck_require__(837);
+const core = __importStar(__nccwpck_require__(186));
+const readdir = (0, util_1.promisify)(fs.readdir);
+const lstat = (0, util_1.promisify)(fs.lstat);
+const exec = (0, util_1.promisify)(cp.exec);
+exports.skipDirs = [
+    'node_modules',
+    'src-gen',
+    'gh-action-test-0',
+    'gh-action-test-1',
+    'gh-action-test-2'
+];
+function skipDir(dirName, skipFailed) {
+    if (exports.skipDirs.includes(dirName) || (skipFailed && dirName.includes('fail'))) {
+        return true;
+    }
+    return false;
+}
+function checkAll(dir, ignore) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let passed = true;
+        const files = yield readdir(dir);
+        for (const fileName of files) {
+            const filePath = `${dir}/${fileName}`;
+            const fileStats = yield lstat(filePath);
+            if (fileStats.isDirectory()) {
+                // Recursively traverse subdirectories
+                if (!skipDir(fileName, ignore)) {
+                    passed = (yield checkAll(filePath, ignore)) && passed;
+                }
+            }
+            else if (fileName.endsWith('.lf')) {
+                // Invoke command on file
+                try {
+                    yield exec(`lfc "${filePath}"`, { env: process.env });
+                    core.info(`✔️ ${filePath}`);
+                }
+                catch (error) {
+                    core.info(`❌ ${filePath} (compilation failed)`);
+                    passed = false;
+                }
+            }
+        }
+        return passed;
+    });
+}
+exports.checkAll = checkAll;
+
+
+/***/ }),
+
 /***/ 109:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -39,56 +203,56 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.run = void 0;
 const core = __importStar(__nccwpck_require__(186));
-const wait_1 = __nccwpck_require__(817);
-function run() {
+const build_1 = __nccwpck_require__(982);
+const check_1 = __nccwpck_require__(657);
+function run(softError = false) {
     return __awaiter(this, void 0, void 0, function* () {
+        let result = 'Success';
+        const dir = core.getInput('checkout_dir');
         try {
-            const ms = core.getInput('milliseconds');
-            core.debug(`Waiting ${ms} milliseconds ...`); // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
-            core.debug(new Date().toTimeString());
-            yield (0, wait_1.wait)(parseInt(ms, 10));
-            core.debug(new Date().toTimeString());
-            core.setOutput('time', new Date().toTimeString());
+            const ref = core.getInput('compiler_ref');
+            const del = core.getInput('delete_if_exists') === 'true';
+            const skip = core.getInput('skip_clone') === 'true';
+            const ignore = core.getInput('ignore_failing') === 'true';
+            if (skip) {
+                core.info(`Using existing clone of the Lingua Franca repository in directory '${dir}'`);
+            }
+            else {
+                if (del) {
+                    yield (0, build_1.deleteIfExists)(dir);
+                }
+                core.info(`Cloning the Lingua Franca repository (${ref}) into directory '${dir}'`);
+                yield (0, build_1.clone)(ref, dir);
+            }
+            (0, build_1.configurePath)(dir);
+            core.info('Checking all Lingua Franca files:');
+            check_1.skipDirs.push(dir);
+            if ((yield (0, check_1.checkAll)('.', ignore)) === false) {
+                result = 'One or more tests failed to compile';
+                if (!softError) {
+                    core.setFailed(result);
+                }
+            }
         }
         catch (error) {
             if (error instanceof Error)
                 core.setFailed(error.message);
         }
+        finally {
+            core.info('Stopping Gradle daemons...');
+            yield (0, build_1.gradleStop)(dir);
+        }
+        return result;
     });
 }
-run();
-
-
-/***/ }),
-
-/***/ 817:
-/***/ (function(__unused_webpack_module, exports) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.wait = void 0;
-function wait(milliseconds) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise(resolve => {
-            if (isNaN(milliseconds)) {
-                throw new Error('milliseconds not a number');
-            }
-            setTimeout(() => resolve('done!'), milliseconds);
-        });
-    });
-}
-exports.wait = wait;
+exports.run = run;
+// Only execute run() if not in a test environment,
+// unless the environment variable GH_ACTIONS was set
+// explicitly to signal that we _do_ want to invoke run.
+if (process.env['NODE_ENV'] !== 'test' || process.env['GH_ACTIONS'] === 'true')
+    run();
 
 
 /***/ }),
@@ -2788,6 +2952,14 @@ module.exports = require("assert");
 
 /***/ }),
 
+/***/ 81:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("child_process");
+
+/***/ }),
+
 /***/ 113:
 /***/ ((module) => {
 
@@ -2833,6 +3005,22 @@ module.exports = require("https");
 
 "use strict";
 module.exports = require("net");
+
+/***/ }),
+
+/***/ 977:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:fs/promises");
+
+/***/ }),
+
+/***/ 411:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:path");
 
 /***/ }),
 

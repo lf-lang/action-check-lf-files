@@ -1,11 +1,27 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Check Lingua Franca files'
+description: 'Ensure that all Lingua Franca files compile'
+author: 'Marten Lohstroh'
 inputs:
-  milliseconds: # change this
-    required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  compiler_ref:
+    required: false
+    description: 'Ref of the compiler to check against'
+    default: 'master'
+  checkout_dir:
+    required: false
+    description: 'The directory in which to check out the lingua-franca repo'
+    default: 'lingua-franca'
+  delete_if_exists:
+    required: false
+    description: 'Delete the checkout directory if it exists prior to cloning'
+    default: false
+  skip_clone:
+    required: false
+    description: 'Use existing clone of lingua-franca'
+    default: false
+  ignore_failing:
+    required: false
+    description: 'Ignore files already marked as failing'
+    default: true
 runs:
   using: 'node16'
   main: 'dist/index.js'
