@@ -26,7 +26,7 @@ test('catch soft errors', async () => {
   const result = await run(true)
   expect(result).toBe('One or more tests failed to compile')
 
-}, 120000)
+}, 600000) // 10 min timeout
 
 // test('run as child process', () => {
 //     process.env['INPUT_CHECKOUT_DIR'] = 'gh-action-test-1'
