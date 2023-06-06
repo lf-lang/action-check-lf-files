@@ -5,6 +5,7 @@ import * as core from '@actions/core'
 
 const readdir = promisify(fs.readdir)
 const lstat = promisify(fs.lstat)
+const exec = promisify(cp.exec)
 
 export const skipDirs = [
   'node_modules',
@@ -13,19 +14,6 @@ export const skipDirs = [
   'gh-action-test-1',
   'gh-action-test-2'
 ]
-
-async function run(
-  cmd: string,
-  options?: cp.ExecOptions
-): Promise<string | Buffer> {
-  return new Promise((resolve, reject) => {
-    cp.exec(cmd, options, (error, stdout, stderr) => {
-      if (error) return reject(error)
-      if (stderr) return reject(stderr)
-      resolve(stdout)
-    })
-  })
-}
 
 function skipDir(dirName: string, skipFailed: boolean): boolean {
   if (skipDirs.includes(dirName) || (skipFailed && dirName.includes('fail'))) {
@@ -51,10 +39,7 @@ export async function checkAll(dir: string, ignore: boolean): Promise<boolean> {
     } else if (fileName.endsWith('.lf')) {
       // Invoke command on file
       try {
-        const options: cp.ExecOptions = {
-          env: process.env
-        }
-        await run(`lfc "${filePath}"`, options)
+        await exec(`lfc "${filePath}"`, {env: process.env})
         core.info(`✔️ ${filePath}`)
       } catch (error) {
         core.info(`❌ ${filePath} (compilation failed)`)
