@@ -1,7 +1,10 @@
 import {simpleGit} from 'simple-git'
-import * as cp from 'child_process'
+import * as child_process from 'child_process'
 import {rm} from 'node:fs/promises'
 import * as path from 'node:path'
+import {promisify} from 'util'
+
+const exec = promisify(child_process.exec)
 
 export async function deleteIfExists(dir: string): Promise<void> {
   return rm(dir, {recursive: true, force: true})
@@ -13,7 +16,7 @@ export async function clone(ref: string, dir: string): Promise<void> {
 }
 
 export async function build(dir: string): Promise<void> {
-  cp.exec('./gradlew assemble', {cwd: dir})
+  exec('./gradlew assemble', {cwd: dir})
 }
 
 export function configurePath(dir: string): void {

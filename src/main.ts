@@ -2,7 +2,8 @@ import * as core from '@actions/core'
 import {configurePath, deleteIfExists, clone, build} from './build'
 import {skipDirs, checkAll} from './check'
 
-export async function run(): Promise<void> {
+export async function run(softError = false): Promise<string> {
+  let result = 'Success'
   try {
     const ref = core.getInput('compiler_ref')
     const dir = core.getInput('checkout_dir')
@@ -32,12 +33,19 @@ export async function run(): Promise<void> {
     core.info('Checking all Lingua Franca files:')
     skipDirs.push(dir)
     if ((await checkAll('.', ignore)) === false) {
-      core.setFailed('One or more tests failed to compile')
+      result = 'One or more tests failed to compile'
+      if (!softError) {
+        core.setFailed(result)
+      }
     }
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
+  return result
 }
 
+// Only execute run() if not in a test environment,
+// unless the environment variable GH_ACTIONS was set
+// explicitly to signal that we _do_ want to invoke run.
 if (process.env['NODE_ENV'] !== 'test' || process.env['GH_ACTIONS'] === 'true')
   run()

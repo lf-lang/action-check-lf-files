@@ -4,27 +4,30 @@ import * as cp from 'child_process'
 import * as path from 'path'
 import {expect, test} from '@jest/globals'
 import {run} from '../src/main'
+import * as core from '@actions/core'
 
 const quick = false // change to true for quicker testing
 
-// if (!quick) {
-//     test('checkout repo', async () => {
-//         await deleteIfExists('foo')
-//         await expect(clone('master', 'foo'))
-//         await expect(clone('master', 'foo')).rejects.toThrow("fatal: destination path 'foo' already exists and is not an empty directory.")
-//         await deleteIfExists('foo')
-//     })
-// }
+if (!quick) {
+    test('checkout repo', async () => {
+        await deleteIfExists('gh-action-test-2')
+        await expect(clone('master', 'gh-action-test-2'))
+        await expect(clone('master', 'gh-action-test-2')).rejects.toThrow("fatal: destination path 'foo' already exists and is not an empty directory.")
+        await deleteIfExists('gh-action-test-2')
+    })
+}
 
 // shows how the runner will run a javascript action with env / stdout protocol
-test('run directly', async () => {
+test('catch soft errors', async () => {
   process.env['INPUT_CHECKOUT_DIR'] = 'gh-action-test-0'
   process.env['INPUT_COMPILER_REF'] = 'master'
   process.env['INPUT_DELETE_IF_EXISTS'] = 'true'
   process.env['INPUT_SKIP_CLONE'] = String(quick)
   process.env['INPUT_IGNORE_FAILING'] = 'false'
 
-  await run()
+  const result = await run(true)
+  expect(result).toBe('One or more tests failed to compile')
+
 }, 60000)
 
 test('run as child process', () => {

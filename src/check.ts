@@ -7,7 +7,13 @@ const readdir = promisify(fs.readdir)
 const lstat = promisify(fs.lstat)
 const exec = promisify(child_process.exec)
 
-export const skipDirs = ['node_modules', 'src-gen', 'gh-action-test-0', 'gh-action-test-1']
+export const skipDirs = [
+  'node_modules',
+  'src-gen',
+  'gh-action-test-0',
+  'gh-action-test-1',
+  'gh-action-test-2'
+]
 
 function skipDir(dirName: string, skipFailed: boolean): boolean {
   if (skipDirs.includes(dirName) || (skipFailed && dirName.includes('fail'))) {
