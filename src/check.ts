@@ -54,7 +54,6 @@ export async function checkAll(lfDir: string, dir: string, ignore: boolean): Pro
         const options: cp.ExecOptions = {
           env: process.env
         }
-	core.info(fileName)
         await run(`${lfDir}/bin/lfc "${filePath}"`, options)
         core.info(`✔️ ${filePath}`)
       } catch (error) {
