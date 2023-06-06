@@ -1,15 +1,28 @@
 import * as fs from 'fs'
-import * as child_process from 'child_process'
+import * as cp from 'child_process'
 import {promisify} from 'util'
 import * as core from '@actions/core'
 
 const readdir = promisify(fs.readdir)
 const lstat = promisify(fs.lstat)
-const exec = promisify(child_process.exec)
+const exec = promisify(cp.exec)
 
-const ignore = [core.getInput('checkout_dir'), 'node_modules'] //, 'failing']
+export const skipDirs = [
+  'node_modules',
+  'src-gen',
+  'gh-action-test-0',
+  'gh-action-test-1',
+  'gh-action-test-2'
+]
 
-export async function checkAll(dir: string): Promise<boolean> {
+function skipDir(dirName: string, skipFailed: boolean): boolean {
+  if (skipDirs.includes(dirName) || (skipFailed && dirName.includes('fail'))) {
+    return true
+  }
+  return false
+}
+
+export async function checkAll(dir: string, ignore: boolean): Promise<boolean> {
   let passed = true
 
   const files = await readdir(dir)
@@ -18,13 +31,15 @@ export async function checkAll(dir: string): Promise<boolean> {
     const filePath = `${dir}/${fileName}`
     const fileStats = await lstat(filePath)
 
-    if (fileStats.isDirectory() && !ignore.includes(fileName)) {
+    if (fileStats.isDirectory()) {
       // Recursively traverse subdirectories
-      passed = (await checkAll(filePath)) && passed
+      if (!skipDir(fileName, ignore)) {
+        passed = (await checkAll(filePath, ignore)) && passed
+      }
     } else if (fileName.endsWith('.lf')) {
       // Invoke command on file
       try {
-        await exec(`lfc "${filePath}"`)
+        await exec(`lfc "${filePath}"`, {env: process.env})
         core.info(`✔️ ${filePath}`)
       } catch (error) {
         core.info(`❌ ${filePath} (compilation failed)`)
