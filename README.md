@@ -4,7 +4,7 @@
 
 # Summary
 
-This GitHub action recursively visits a given `search_dir`, finds every `.lf` file, and reports each file that fail to compile.
+This GitHub action recursively visits a given `search_dir`, finds every `.lf` file, and reports each file that failed to compile.
 
 # Usage
 
