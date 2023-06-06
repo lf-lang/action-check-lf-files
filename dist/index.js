@@ -56,8 +56,7 @@ function clone(ref, dir) {
     return __awaiter(this, void 0, void 0, function* () {
         const git = (0, simple_git_1.simpleGit)();
         yield git.clone('https://github.com/lf-lang/lingua-franca.git', dir);
-        yield git.submoduleInit();
-        yield git.submoduleUpdate();
+        yield exec('git submodule update --init', { cwd: dir });
     });
 }
 exports.clone = clone;
@@ -171,7 +170,6 @@ function checkAll(lfDir, dir, ignore) {
                     const options = {
                         env: process.env
                     };
-                    core.info(fileName);
                     yield run(`${lfDir}/bin/lfc "${filePath}"`, options);
                     core.info(`✔️ ${filePath}`);
                 }

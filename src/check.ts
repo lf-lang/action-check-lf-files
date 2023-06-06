@@ -34,7 +34,11 @@ function skipDir(dirName: string, skipFailed: boolean): boolean {
   return false
 }
 
-export async function checkAll(lfDir: string, dir: string, ignore: boolean): Promise<boolean> {
+export async function checkAll(
+  lfDir: string,
+  dir: string,
+  ignore: boolean
+): Promise<boolean> {
   let passed = true
 
   const files = await readdir(dir)

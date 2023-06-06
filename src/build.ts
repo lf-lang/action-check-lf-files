@@ -13,7 +13,7 @@ export async function deleteIfExists(dir: string): Promise<void> {
 export async function clone(ref: string, dir: string): Promise<void> {
   const git = simpleGit()
   await git.clone('https://github.com/lf-lang/lingua-franca.git', dir)
-  await exec('git submodule update --init')
+  await exec('git submodule update --init', {cwd: dir})
 }
 
 export async function build(dir: string): Promise<void> {
