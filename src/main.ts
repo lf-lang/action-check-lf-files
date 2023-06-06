@@ -8,7 +8,7 @@ export async function run(softError = false): Promise<string> {
   const excludes: string[] = JSON.parse(core.getInput('exclude_dirs'))
   const ref = core.getInput('compiler_ref')
   const del = core.getInput('delete_if_exists') === 'true'
-  const noCompile = core.getInput('no-compile-flag') === 'true'
+  const noCompile = core.getInput('no_compile_flag') === 'true'
   const skip = core.getInput('skip_clone') === 'true'
   const searchDir = core.getInput('search_dir')
   try {

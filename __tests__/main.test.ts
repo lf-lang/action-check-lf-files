@@ -29,20 +29,20 @@ test('expect failure', async () => {
 }, 600000)
 
 // Run the action as a subprocess.
-// test('exclude failing', () => {
-//     process.env['INPUT_CHECKOUT_DIR'] = 'gh-action-test-1'
-//     process.env['INPUT_COMPILER_REF'] = 'master'
-//     process.env['INPUT_DELETE_IF_EXISTS'] = 'true'
-//     process.env['INPUT_SKIP_CLONE'] = String(quick)
-//     process.env['INPUT_EXCLUDE_DIRS'] = '["failing"]'
-//     process.env['GH_ACTIONS'] = 'true'
-//     process.env['INPUT_SEARCH_DIR'] = '.'
-//     process.env['INPUT_NO_COMPILE_FLAG'] = 'false'
-//     const np = process.execPath
-//     const ip = path.join(__dirname, '..', 'lib', 'main.js')
-//     const options: cp.ExecFileSyncOptions = {
-//       env: process.env
-//     }
-//     console.log(cp.execFileSync(np, [ip], options).toString())
-//   })
+test('exclude failing', () => {
+    process.env['INPUT_CHECKOUT_DIR'] = 'gh-action-test-1'
+    process.env['INPUT_COMPILER_REF'] = 'master'
+    process.env['INPUT_DELETE_IF_EXISTS'] = 'true'
+    process.env['INPUT_SKIP_CLONE'] = String(quick)
+    process.env['INPUT_EXCLUDE_DIRS'] = '["failing"]'
+    process.env['GH_ACTIONS'] = 'true'
+    process.env['INPUT_SEARCH_DIR'] = '.'
+    process.env['INPUT_NO_COMPILE_FLAG'] = 'false'
+    const np = process.execPath
+    const ip = path.join(__dirname, '..', 'lib', 'main.js')
+    const options: cp.ExecFileSyncOptions = {
+      env: process.env
+    }
+    console.log(cp.execFileSync(np, [ip], options).toString())
+  })
   
