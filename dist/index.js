@@ -39,7 +39,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.configurePath = exports.gradleStop = exports.build = exports.clone = exports.deleteIfExists = void 0;
+exports.configurePath = exports.gradleStop = exports.clone = exports.deleteIfExists = void 0;
 const simple_git_1 = __nccwpck_require__(9103);
 const child_process = __importStar(__nccwpck_require__(2081));
 const promises_1 = __nccwpck_require__(3977);
@@ -60,12 +60,6 @@ function clone(ref, dir) {
     });
 }
 exports.clone = clone;
-function build(dir) {
-    return __awaiter(this, void 0, void 0, function* () {
-        exec('./gradlew assemble --info --stacktrace', { cwd: dir });
-    });
-}
-exports.build = build;
 function gradleStop(dir) {
     return __awaiter(this, void 0, void 0, function* () {
         exec('./gradlew --stop', { cwd: dir });
@@ -232,9 +226,9 @@ const check_1 = __nccwpck_require__(7657);
 function run(softError = false) {
     return __awaiter(this, void 0, void 0, function* () {
         let result = 'Success';
+        const dir = core.getInput('checkout_dir');
         try {
             const ref = core.getInput('compiler_ref');
-            const dir = core.getInput('checkout_dir');
             const del = core.getInput('delete_if_exists') === 'true';
             const skip = core.getInput('skip_clone') === 'true';
             const ignore = core.getInput('ignore_failing') === 'true';
@@ -248,8 +242,6 @@ function run(softError = false) {
                 core.info(`Cloning the Lingua Franca repository (${ref}) into directory '${dir}'`);
                 yield (0, build_1.clone)(ref, dir);
             }
-            core.info('Building the Lingua Franca compiler...');
-            // await build(dir)
             (0, build_1.configurePath)(dir);
             core.info('Checking all Lingua Franca files:');
             check_1.skipDirs.push(dir);
@@ -259,11 +251,14 @@ function run(softError = false) {
                     core.setFailed(result);
                 }
             }
-            yield (0, build_1.gradleStop)(dir);
         }
         catch (error) {
             if (error instanceof Error)
                 core.setFailed(error.message);
+        }
+        finally {
+            core.info('Stopping Gradle daemons...');
+            yield (0, build_1.gradleStop)(dir);
         }
         return result;
     });

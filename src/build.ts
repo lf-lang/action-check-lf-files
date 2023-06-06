@@ -16,10 +16,6 @@ export async function clone(ref: string, dir: string): Promise<void> {
   await exec('git submodule update --init', {cwd: dir})
 }
 
-export async function build(dir: string): Promise<void> {
-  exec('./gradlew assemble --info --stacktrace', {cwd: dir})
-}
-
 export async function gradleStop(dir: string): Promise<void> {
   exec('./gradlew --stop', {cwd: dir})
 }
