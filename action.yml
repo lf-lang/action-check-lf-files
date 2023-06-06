@@ -16,8 +16,8 @@ inputs:
     default: false
   exclude_dirs:
     required: false
-    description: 'JSON array of directories to not visit'
-    default: '[]'
+    description: 'JSON array of directories not to visit'
+    default: '["failing"]'
   search_dir:
     required: false
     description: 'Starting point of traversal to find LF files'

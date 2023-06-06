@@ -14,14 +14,14 @@ export async function run(softError = false): Promise<string> {
   try {
     if (skip) {
       core.info(
-        `Using existing clone of the Lingua Franca repository in directory '${dir}'...`
+        `Using existing clone of the Lingua Franca repository in directory '${dir}'.`
       )
     } else {
       if (del) {
         await deleteIfExists(dir)
       }
       core.info(
-        `Cloning the Lingua Franca repository (${ref}) into directory '${dir}'`
+        `Cloning the Lingua Franca repository (${ref}) into directory '${dir}'...`
       )
       await clone(ref, dir)
     }

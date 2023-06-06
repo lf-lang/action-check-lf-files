@@ -210,13 +210,13 @@ function run(softError = false) {
         const searchDir = core.getInput('search_dir');
         try {
             if (skip) {
-                core.info(`Using existing clone of the Lingua Franca repository in directory '${dir}'...`);
+                core.info(`Using existing clone of the Lingua Franca repository in directory '${dir}'.`);
             }
             else {
                 if (del) {
                     yield (0, build_1.deleteIfExists)(dir);
                 }
-                core.info(`Cloning the Lingua Franca repository (${ref}) into directory '${dir}'`);
+                core.info(`Cloning the Lingua Franca repository (${ref}) into directory '${dir}'...`);
                 yield (0, build_1.clone)(ref, dir);
             }
             (0, build_1.configurePath)(dir);
