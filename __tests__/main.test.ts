@@ -12,8 +12,7 @@ if (!quick) {
     test('checkout repo', async () => {
         await deleteIfExists('gh-action-test-2')
         await expect(clone('master', 'gh-action-test-2'))
-        await expect(clone('master', 'gh-action-test-2')).rejects.toThrow("fatal: destination path 'foo' already exists and is not an empty directory.")
-        await deleteIfExists('gh-action-test-2')
+        await expect(clone('master', 'gh-action-test-2')).rejects.toThrow("fatal: destination path 'gh-action-test-2' already exists and is not an empty directory.")
     })
 }
 
