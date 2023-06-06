@@ -2,6 +2,10 @@
   <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
 </p>
 
+# Summary
+
+This GitHub action recursively visits a given `search_dir`, finds every `.lf` file, and reports each file that fail to compile.
+
 # Usage
 
 ```
@@ -30,7 +34,7 @@ Build the typescript and package it for distribution
 $ npm run build && npm run package
 ```
 
-Run the tests :heavy_check_mark:  
+Run the tests 
 ```bash
 $ npm test
 ...
