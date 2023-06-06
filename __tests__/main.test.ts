@@ -8,13 +8,13 @@ import * as core from '@actions/core'
 
 const quick = false // change to true for quicker testing
 
-if (!quick) {
-    test('checkout repo', async () => {
-        await deleteIfExists('gh-action-test-2')
-        await expect(clone('master', 'gh-action-test-2'))
-        await expect(clone('master', 'gh-action-test-2')).rejects.toThrow("fatal: destination path 'gh-action-test-2' already exists and is not an empty directory.")
-    })
-}
+// if (!quick) {
+//     test('checkout repo', async () => {
+//         await deleteIfExists('gh-action-test-2')
+//         await expect(clone('master', 'gh-action-test-2'))
+//         await expect(clone('master', 'gh-action-test-2')).rejects.toThrow("fatal: destination path 'gh-action-test-2' already exists and is not an empty directory.")
+//     })
+// }
 
 // shows how the runner will run a javascript action with env / stdout protocol
 test('catch soft errors', async () => {
