@@ -34,7 +34,7 @@ function skipDir(dirName: string, skipFailed: boolean): boolean {
   return false
 }
 
-export async function checkAll(dir: string, ignore: boolean): Promise<boolean> {
+export async function checkAll(lfDir: string, dir: string, ignore: boolean): Promise<boolean> {
   let passed = true
 
   const files = await readdir(dir)
@@ -46,7 +46,7 @@ export async function checkAll(dir: string, ignore: boolean): Promise<boolean> {
     if (fileStats.isDirectory()) {
       // Recursively traverse subdirectories
       if (!skipDir(fileName, ignore)) {
-        passed = (await checkAll(filePath, ignore)) && passed
+        passed = (await checkAll(lfDir, filePath, ignore)) && passed
       }
     } else if (fileName.endsWith('.lf')) {
       // Invoke command on file
@@ -54,7 +54,8 @@ export async function checkAll(dir: string, ignore: boolean): Promise<boolean> {
         const options: cp.ExecOptions = {
           env: process.env
         }
-        await run(`lfc "${filePath}"`, options)
+	core.info(fileName)
+        await run(`${lfDir}/bin/lfc "${filePath}"`, options)
         core.info(`✔️ ${filePath}`)
       } catch (error) {
         core.info(`❌ ${filePath} (compilation failed)`)

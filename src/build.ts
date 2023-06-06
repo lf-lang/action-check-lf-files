@@ -13,10 +13,16 @@ export async function deleteIfExists(dir: string): Promise<void> {
 export async function clone(ref: string, dir: string): Promise<void> {
   const git = simpleGit()
   await git.clone('https://github.com/lf-lang/lingua-franca.git', dir)
+  await git.submoduleInit()
+  await git.submoduleUpdate()
 }
 
 export async function build(dir: string): Promise<void> {
-  exec('./gradlew clean assemble', {cwd: dir})
+  exec('./gradlew assemble --info --stacktrace', {cwd: dir})
+}
+
+export async function gradleStop(dir: string): Promise<void> {
+  exec('./gradlew --stop', {cwd: dir})
 }
 
 export function configurePath(dir: string): void {

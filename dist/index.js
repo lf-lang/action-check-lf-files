@@ -39,7 +39,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.configurePath = exports.build = exports.clone = exports.deleteIfExists = void 0;
+exports.configurePath = exports.gradleStop = exports.build = exports.clone = exports.deleteIfExists = void 0;
 const simple_git_1 = __nccwpck_require__(9103);
 const child_process = __importStar(__nccwpck_require__(2081));
 const promises_1 = __nccwpck_require__(3977);
@@ -56,15 +56,23 @@ function clone(ref, dir) {
     return __awaiter(this, void 0, void 0, function* () {
         const git = (0, simple_git_1.simpleGit)();
         yield git.clone('https://github.com/lf-lang/lingua-franca.git', dir);
+        yield git.submoduleInit();
+        yield git.submoduleUpdate();
     });
 }
 exports.clone = clone;
 function build(dir) {
     return __awaiter(this, void 0, void 0, function* () {
-        exec('./gradlew clean assemble', { cwd: dir });
+        exec('./gradlew assemble --info --stacktrace', { cwd: dir });
     });
 }
 exports.build = build;
+function gradleStop(dir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        exec('./gradlew --stop', { cwd: dir });
+    });
+}
+exports.gradleStop = gradleStop;
 function configurePath(dir) {
     process.env.PATH = `${process.env.PATH}:${path.join(path.resolve(dir), 'bin')}`;
 }
@@ -144,7 +152,7 @@ function skipDir(dirName, skipFailed) {
     }
     return false;
 }
-function checkAll(dir, ignore) {
+function checkAll(lfDir, dir, ignore) {
     return __awaiter(this, void 0, void 0, function* () {
         let passed = true;
         const files = yield readdir(dir);
@@ -154,7 +162,7 @@ function checkAll(dir, ignore) {
             if (fileStats.isDirectory()) {
                 // Recursively traverse subdirectories
                 if (!skipDir(fileName, ignore)) {
-                    passed = (yield checkAll(filePath, ignore)) && passed;
+                    passed = (yield checkAll(lfDir, filePath, ignore)) && passed;
                 }
             }
             else if (fileName.endsWith('.lf')) {
@@ -163,7 +171,8 @@ function checkAll(dir, ignore) {
                     const options = {
                         env: process.env
                     };
-                    yield run(`lfc "${filePath}"`, options);
+                    core.info(fileName);
+                    yield run(`${lfDir}/bin/lfc "${filePath}"`, options);
                     core.info(`✔️ ${filePath}`);
                 }
                 catch (error) {
@@ -242,16 +251,17 @@ function run(softError = false) {
                 yield (0, build_1.clone)(ref, dir);
             }
             core.info('Building the Lingua Franca compiler...');
-            yield (0, build_1.build)(dir);
+            // await build(dir)
             (0, build_1.configurePath)(dir);
             core.info('Checking all Lingua Franca files:');
             check_1.skipDirs.push(dir);
-            if ((yield (0, check_1.checkAll)('.', ignore)) === false) {
+            if ((yield (0, check_1.checkAll)(dir, '.', ignore)) === false) {
                 result = 'One or more tests failed to compile';
                 if (!softError) {
                     core.setFailed(result);
                 }
             }
+            yield (0, build_1.gradleStop)(dir);
         }
         catch (error) {
             if (error instanceof Error)

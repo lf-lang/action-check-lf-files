@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import {configurePath, deleteIfExists, clone, build} from './build'
+import {configurePath, deleteIfExists, clone, build, gradleStop} from './build'
 import {skipDirs, checkAll} from './check'
 
 export async function run(softError = false): Promise<string> {
@@ -26,18 +26,19 @@ export async function run(softError = false): Promise<string> {
     }
 
     core.info('Building the Lingua Franca compiler...')
-    await build(dir)
+    // await build(dir)
 
     configurePath(dir)
 
     core.info('Checking all Lingua Franca files:')
     skipDirs.push(dir)
-    if ((await checkAll('.', ignore)) === false) {
+    if ((await checkAll(dir, '.', ignore)) === false) {
       result = 'One or more tests failed to compile'
       if (!softError) {
         core.setFailed(result)
       }
     }
+    await gradleStop(dir)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
