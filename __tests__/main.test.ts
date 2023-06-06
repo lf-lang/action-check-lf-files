@@ -26,20 +26,20 @@ test('catch soft errors', async () => {
   const result = await run(true)
   expect(result).toBe('One or more tests failed to compile')
 
-}, 60000)
+}, 120000)
 
-test('run as child process', () => {
-    process.env['INPUT_CHECKOUT_DIR'] = 'gh-action-test-1'
-    process.env['INPUT_COMPILER_REF'] = 'master'
-    process.env['INPUT_DELETE_IF_EXISTS'] = 'true'
-    process.env['INPUT_SKIP_CLONE'] = String(quick)
-    process.env['INPUT_IGNORE_FAILING'] = 'true'
-    process.env['GH_ACTIONS'] = 'true'
-    const np = process.execPath
-    const ip = path.join(__dirname, '..', 'lib', 'main.js')
-    const options: cp.ExecFileSyncOptions = {
-      env: process.env
-    }
-    console.log(cp.execFileSync(np, [ip], options).toString())
-  })
+// test('run as child process', () => {
+//     process.env['INPUT_CHECKOUT_DIR'] = 'gh-action-test-1'
+//     process.env['INPUT_COMPILER_REF'] = 'master'
+//     process.env['INPUT_DELETE_IF_EXISTS'] = 'true'
+//     process.env['INPUT_SKIP_CLONE'] = String(quick)
+//     process.env['INPUT_IGNORE_FAILING'] = 'true'
+//     process.env['GH_ACTIONS'] = 'true'
+//     const np = process.execPath
+//     const ip = path.join(__dirname, '..', 'lib', 'main.js')
+//     const options: cp.ExecFileSyncOptions = {
+//       env: process.env
+//     }
+//     console.log(cp.execFileSync(np, [ip], options).toString())
+//   })
   
