@@ -4,15 +4,15 @@ author: 'Marten Lohstroh'
 inputs:
   checkout_dir:
     required: false
-    description: 'The directory in which to check out the lingua-franca repo'
+    description: 'Where the lingua-franca repo should be'
     default: 'lingua-franca'
   compiler_ref:
     required: false
-    description: 'Ref of the compiler to check against'
+    description: 'Which version of the compiler to use'
     default: 'master'
   delete_if_exists:
     required: false
-    description: 'Delete the checkout directory if it exists prior to cloning'
+    description: 'Delete if `checkout_dir` already exists'
     default: false
   exclude_dirs:
     required: false
@@ -20,15 +20,15 @@ inputs:
     default: '["failing"]'
   no_compile_flag:
     required: false
-    description: 'Run lfc with --no-compile flag if true'
+    description: 'un lfc with `--no-compile` flag if true'
     default: false
   skip_clone:
     required: false
-    description: 'Use existing clone of lingua-franca'
+    description: 'Use existing clone of `lingua-franca`'
     default: false
   search_dir:
     required: false
-    description: 'Starting point of traversal to find LF files'
+    description: 'Where to start looking for `.lf` files'
     default: '.'
   
 runs:
