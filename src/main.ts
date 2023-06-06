@@ -1,12 +1,12 @@
 import * as core from '@actions/core'
-import {configurePath, deleteIfExists, clone, build} from './build'
+import {configurePath, deleteIfExists, clone, gradleStop} from './build'
 import {skipDirs, checkAll} from './check'
 
 export async function run(softError = false): Promise<string> {
   let result = 'Success'
+  const dir = core.getInput('checkout_dir')
   try {
     const ref = core.getInput('compiler_ref')
-    const dir = core.getInput('checkout_dir')
     const del = core.getInput('delete_if_exists') === 'true'
     const skip = core.getInput('skip_clone') === 'true'
     const ignore = core.getInput('ignore_failing') === 'true'
@@ -25,9 +25,6 @@ export async function run(softError = false): Promise<string> {
       await clone(ref, dir)
     }
 
-    core.info('Building the Lingua Franca compiler...')
-    await build(dir)
-
     configurePath(dir)
 
     core.info('Checking all Lingua Franca files:')
@@ -40,6 +37,9 @@ export async function run(softError = false): Promise<string> {
     }
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
+  } finally {
+    core.info('Stopping Gradle daemons...')
+    await gradleStop(dir)
   }
   return result
 }
