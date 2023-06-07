@@ -19,41 +19,5 @@ This GitHub action recursively visits a given `search_dir`, finds every `.lf` fi
     skip_clone: false                               # Use an existing clone of `lingua-franca`
     search_dir: '.'                                 # Where to start looking for `.lf` files
 ```
-
-# Building and testing
-
-> First, you'll need to have a reasonably modern version of `node` handy. This won't work with versions older than 9, for instance.
-
-Install the dependencies  
-```bash
-$ npm install
-```
-
-Build the typescript and package it for distribution
-```bash
-$ npm run build && npm run package
-```
-
-Run the tests 
-```bash
-$ npm test
-...
-```
-
-## Publishing to a distribution branch
-
-Actions are run from GitHub repos so we will checkin the packed dist folder. 
-
-Then run [ncc](https://github.com/zeit/ncc) and push the results:
-```bash
-$ npm run package
-$ git add dist
-$ git commit -a -m "prod dependencies"
-$ git push origin releases/v1
-```
-
-Note: GitHub recommends using the `--license` option for ncc, which will create a license file for all of the production node modules used in your project.
-
-The action is now published! :rocket: 
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
+# Contributing
+Developer docs are available [here](CONTRIBUTING.md).
