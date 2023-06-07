@@ -111,7 +111,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.checkAll = exports.skipDirs = void 0;
+exports.checkCompiles = exports.skipDirs = void 0;
 const fs = __importStar(__nccwpck_require__(147));
 const cp = __importStar(__nccwpck_require__(81));
 const util_1 = __nccwpck_require__(837);
@@ -121,9 +121,19 @@ const lstat = (0, util_1.promisify)(fs.lstat);
 const exec = (0, util_1.promisify)(cp.exec);
 // FIXME: allow wildcards?
 exports.skipDirs = ['node_modules', 'src-gen', 'fed-gen'];
-function checkAll(dir, noCompile) {
+function checkCompiles(dir, noCompile) {
     return __awaiter(this, void 0, void 0, function* () {
-        let passed = true;
+        return checkAll(dir, (filePath) => __awaiter(this, void 0, void 0, function* () {
+            return yield exec(`lfc ${noCompile ? '--no-compile' : ''} "${filePath}"`, {
+                env: process.env
+            });
+        }));
+    });
+}
+exports.checkCompiles = checkCompiles;
+function checkAll(dir, cmd) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let failures = 0;
         const files = yield readdir(dir);
         for (const fileName of files) {
             const filePath = `${dir}/${fileName}`;
@@ -131,28 +141,25 @@ function checkAll(dir, noCompile) {
             if (fileStats.isDirectory()) {
                 // Recursively traverse subdirectories
                 if (!exports.skipDirs.includes(fileName)) {
-                    passed = (yield checkAll(filePath, noCompile)) && passed;
+                    failures += yield checkAll(filePath, cmd);
                 }
             }
             else if (fileName.endsWith('.lf')) {
                 // Invoke command on file
                 try {
-                    yield exec(`lfc ${noCompile ? '--no-compile' : ''} "${filePath}"`, {
-                        env: process.env
-                    });
+                    yield cmd(filePath);
                     core.info(`✔️ ${filePath}`);
                 }
                 catch (error) {
-                    core.info(`❌ ${filePath} (compilation failed)`);
+                    core.info(`❌ ${filePath}`);
                     core.error(String(error));
-                    passed = false;
+                    failures++;
                 }
             }
         }
-        return passed;
+        return failures;
     });
 }
-exports.checkAll = checkAll;
 
 
 /***/ }),
@@ -202,6 +209,7 @@ const check_1 = __nccwpck_require__(657);
 function run(softError = false) {
     return __awaiter(this, void 0, void 0, function* () {
         let result = 'Success';
+        const mode = core.getInput('check_mode') === '' ? 'compile' : core.getInput('check_mode');
         const dir = core.getInput('checkout_dir');
         const excludes = JSON.parse(core.getInput('exclude_dirs'));
         const ref = core.getInput('compiler_ref');
@@ -226,8 +234,9 @@ function run(softError = false) {
             for (const exclude of excludes) {
                 check_1.skipDirs.push(exclude);
             }
-            if ((yield (0, check_1.checkAll)(searchDir, noCompile)) === false) {
-                result = 'One or more tests failed to compile';
+            const fails = yield (0, check_1.checkCompiles)(searchDir, noCompile);
+            if (fails > 0) {
+                result = `${fails} file(s) failed ${mode} check`;
                 if (!softError) {
                     core.setFailed(result);
                 }

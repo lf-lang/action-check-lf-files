@@ -12,6 +12,7 @@ This GitHub action recursively visits a given `search_dir`, finds every `.lf` fi
 - uses: lf-lang/action-check-lf-files@main
   with:
     checkout_dir: 'lingua-franca'                   # Where the lingua-franca repo should be
+    check_mode: `compile`                           # Do `compile` (default) or `format` check
     compiler_ref: 'master'                          # Which version of the compiler to use
     delete_if_exists: false                         # Delete if `checkout_dir` already exists
     exclude_dirs: '["failing", "experimental"]'     # JSON array of directories not to visit

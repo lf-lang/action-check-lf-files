@@ -17,6 +17,7 @@ if (!quick) {
 
 // Run the action in the same process. (NOTE: also useful for debugging!)
 test('expect failure', async () => {
+    process.env['INPUT_CHECK_MODE'] = 'compile'
     process.env['INPUT_CHECKOUT_DIR'] = 'gh-action-test-0'
     process.env['INPUT_COMPILER_REF'] = 'master'
     process.env['INPUT_DELETE_IF_EXISTS'] = 'true'
@@ -25,6 +26,6 @@ test('expect failure', async () => {
     process.env['INPUT_SEARCH_DIR'] = '.'
     process.env['INPUT_NO_COMPILE_FLAG'] = 'false'
     const result = await run(true)
-    expect(result).toBe('One or more tests failed to compile')
+    expect(result).toBe('1 file(s) failed compile check')
   }, 600000)
   

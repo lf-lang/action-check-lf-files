@@ -1,9 +1,11 @@
 import * as core from '@actions/core'
 import {configurePath, deleteIfExists, clone, gradleStop} from './build'
-import {skipDirs, checkAll} from './check'
+import {skipDirs, checkCompiles} from './check'
 
 export async function run(softError = false): Promise<string> {
   let result = 'Success'
+  const mode =
+    core.getInput('check_mode') === '' ? 'compile' : core.getInput('check_mode')
   const dir = core.getInput('checkout_dir')
   const excludes: string[] = JSON.parse(core.getInput('exclude_dirs'))
   const ref = core.getInput('compiler_ref')
@@ -33,8 +35,9 @@ export async function run(softError = false): Promise<string> {
     for (const exclude of excludes) {
       skipDirs.push(exclude)
     }
-    if ((await checkAll(searchDir, noCompile)) === false) {
-      result = 'One or more tests failed to compile'
+    const fails = await checkCompiles(searchDir, noCompile)
+    if (fails > 0) {
+      result = `${fails} file(s) failed ${mode} check`
       if (!softError) {
         core.setFailed(result)
       }
