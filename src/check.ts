@@ -10,7 +10,7 @@ const exec = promisify(cp.exec)
 // FIXME: allow wildcards?
 export const skipDirs = ['node_modules', 'src-gen', 'fed-gen']
 
-export async function checkCompiles(
+export async function checkCompile(
   dir: string,
   noCompile: boolean
 ): Promise<number> {
@@ -18,6 +18,16 @@ export async function checkCompiles(
     dir,
     async filePath =>
       await exec(`lfc ${noCompile ? '--no-compile' : ''} "${filePath}"`, {
+        env: process.env
+      })
+  )
+}
+
+export async function checkFormat(dir: string): Promise<number> {
+  return checkAll(
+    dir,
+    async filePath =>
+      await exec(`lff --check "${filePath}"`, {
         env: process.env
       })
   )

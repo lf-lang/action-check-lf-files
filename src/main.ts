@@ -1,11 +1,17 @@
 import * as core from '@actions/core'
 import {configurePath, deleteIfExists, clone, gradleStop} from './build'
-import {skipDirs, checkCompiles} from './check'
+import {skipDirs, checkCompile} from './check'
+
+// eslint-disable-next-line no-shadow
+enum Mode {
+  Compile = 'compile',
+  Format = 'format'
+}
 
 export async function run(softError = false): Promise<string> {
   let result = 'Success'
   const mode =
-    core.getInput('check_mode') === '' ? 'compile' : core.getInput('check_mode')
+    core.getInput('check_mode') === Mode.Format ? Mode.Format : Mode.Compile
   const dir = core.getInput('checkout_dir')
   const excludes: string[] = JSON.parse(core.getInput('exclude_dirs'))
   const ref = core.getInput('compiler_ref')
@@ -35,7 +41,16 @@ export async function run(softError = false): Promise<string> {
     for (const exclude of excludes) {
       skipDirs.push(exclude)
     }
-    const fails = await checkCompiles(searchDir, noCompile)
+    let fails = 0
+    switch (mode) {
+      case Mode.Compile:
+        fails = await checkCompile(searchDir, noCompile)
+        break
+      case Mode.Format:
+        // fails = await checkFormat(searchDir)
+        break
+    }
+
     if (fails > 0) {
       result = `${fails} file(s) failed ${mode} check`
       if (!softError) {

@@ -111,7 +111,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.checkCompiles = exports.skipDirs = void 0;
+exports.checkFormat = exports.checkCompile = exports.skipDirs = void 0;
 const fs = __importStar(__nccwpck_require__(147));
 const cp = __importStar(__nccwpck_require__(81));
 const util_1 = __nccwpck_require__(837);
@@ -121,7 +121,7 @@ const lstat = (0, util_1.promisify)(fs.lstat);
 const exec = (0, util_1.promisify)(cp.exec);
 // FIXME: allow wildcards?
 exports.skipDirs = ['node_modules', 'src-gen', 'fed-gen'];
-function checkCompiles(dir, noCompile) {
+function checkCompile(dir, noCompile) {
     return __awaiter(this, void 0, void 0, function* () {
         return checkAll(dir, (filePath) => __awaiter(this, void 0, void 0, function* () {
             return yield exec(`lfc ${noCompile ? '--no-compile' : ''} "${filePath}"`, {
@@ -130,7 +130,17 @@ function checkCompiles(dir, noCompile) {
         }));
     });
 }
-exports.checkCompiles = checkCompiles;
+exports.checkCompile = checkCompile;
+function checkFormat(dir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return checkAll(dir, (filePath) => __awaiter(this, void 0, void 0, function* () {
+            return yield exec(`lff --check "${filePath}"`, {
+                env: process.env
+            });
+        }));
+    });
+}
+exports.checkFormat = checkFormat;
 function checkAll(dir, cmd) {
     return __awaiter(this, void 0, void 0, function* () {
         let failures = 0;
@@ -206,10 +216,16 @@ exports.run = void 0;
 const core = __importStar(__nccwpck_require__(186));
 const build_1 = __nccwpck_require__(982);
 const check_1 = __nccwpck_require__(657);
+// eslint-disable-next-line no-shadow
+var Mode;
+(function (Mode) {
+    Mode["Compile"] = "compile";
+    Mode["Format"] = "format";
+})(Mode || (Mode = {}));
 function run(softError = false) {
     return __awaiter(this, void 0, void 0, function* () {
         let result = 'Success';
-        const mode = core.getInput('check_mode') === '' ? 'compile' : core.getInput('check_mode');
+        const mode = core.getInput('check_mode') === Mode.Format ? Mode.Format : Mode.Compile;
         const dir = core.getInput('checkout_dir');
         const excludes = JSON.parse(core.getInput('exclude_dirs'));
         const ref = core.getInput('compiler_ref');
@@ -234,7 +250,15 @@ function run(softError = false) {
             for (const exclude of excludes) {
                 check_1.skipDirs.push(exclude);
             }
-            const fails = yield (0, check_1.checkCompiles)(searchDir, noCompile);
+            let fails = 0;
+            switch (mode) {
+                case Mode.Compile:
+                    fails = yield (0, check_1.checkCompile)(searchDir, noCompile);
+                    break;
+                case Mode.Format:
+                    // fails = await checkFormat(searchDir)
+                    break;
+            }
             if (fails > 0) {
                 result = `${fails} file(s) failed ${mode} check`;
                 if (!softError) {
