@@ -20,4 +20,5 @@ This GitHub action recursively visits a given `search_dir`, finds every `.lf` fi
     search_dir: '.'                                 # Where to start looking for `.lf` files
 ```
 # Contributing
-Developer docs are available [here](CONTRIBUTING.md).
+
+For developer docs that describe how to build, test, and publish, have a look [here](CONTRIBUTING.md).
