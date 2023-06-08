@@ -72,4 +72,9 @@ export async function run(softError = false): Promise<string> {
 if (process.env['NODE_ENV'] !== 'test' || process.env['MAIN_DO_RUN'] === 'true')
   run()
 if (process.env['NODE_ENV'] === 'test')
-  skipDirs.push('gh-action-test-0', 'gh-action-test-1', 'gh-action-test-2')
+  skipDirs.push(
+    'gh-action-test-0',
+    'gh-action-test-1',
+    'gh-action-test-2',
+    'gh-action-test-3'
+  )

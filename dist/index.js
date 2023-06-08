@@ -284,7 +284,7 @@ exports.run = run;
 if (process.env['NODE_ENV'] !== 'test' || process.env['MAIN_DO_RUN'] === 'true')
     run();
 if (process.env['NODE_ENV'] === 'test')
-    check_1.skipDirs.push('gh-action-test-0', 'gh-action-test-1', 'gh-action-test-2');
+    check_1.skipDirs.push('gh-action-test-0', 'gh-action-test-1', 'gh-action-test-2', 'gh-action-test-3');
 
 
 /***/ }),
