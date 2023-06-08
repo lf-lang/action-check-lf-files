@@ -47,7 +47,7 @@ export async function run(softError = false): Promise<string> {
         fails = await checkCompile(searchDir, noCompile)
         break
       case Mode.Format:
-        // fails = await checkFormat(searchDir)
+        fails = await checkFormat(searchDir)
         break
     }
 
