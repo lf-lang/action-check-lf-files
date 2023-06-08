@@ -2,6 +2,10 @@ name: 'Check Lingua Franca files'
 description: 'Ensure that all Lingua Franca files compile'
 author: 'Marten Lohstroh'
 inputs:
+  check_mode:
+    required: false
+    description: '`compile` (default) or `format`'
+    default: "compile"
   checkout_dir:
     required: false
     description: 'Where the lingua-franca repo should be'

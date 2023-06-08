@@ -6,6 +6,7 @@ import {quick} from './debug.test'
 
 // Run the action as a subprocess.
 test('exclude failing', () => {
+  process.env['INPUT_CHECK_MODE'] = 'compile'
   process.env['INPUT_CHECKOUT_DIR'] = 'gh-action-test-1'
   process.env['INPUT_COMPILER_REF'] = 'master'
   process.env['INPUT_DELETE_IF_EXISTS'] = 'true'
