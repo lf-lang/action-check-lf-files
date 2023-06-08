@@ -256,7 +256,7 @@ function run(softError = false) {
                     fails = yield (0, check_1.checkCompile)(searchDir, noCompile);
                     break;
                 case Mode.Format:
-                    // fails = await checkFormat(searchDir)
+                    fails = yield (0, check_1.checkFormat)(searchDir);
                     break;
             }
             if (fails > 0) {

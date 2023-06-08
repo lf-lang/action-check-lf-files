@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import {configurePath, deleteIfExists, clone, gradleStop} from './build'
-import {skipDirs, checkCompile} from './check'
+import {skipDirs, checkCompile, checkFormat} from './check'
 
 // eslint-disable-next-line no-shadow
 enum Mode {
