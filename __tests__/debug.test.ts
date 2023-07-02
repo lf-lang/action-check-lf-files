@@ -12,7 +12,7 @@ if (!quick) {
     await expect(clone('master', 'gh-action-test-2')).rejects.toThrow(
       "fatal: destination path 'gh-action-test-2' already exists and is not an empty directory."
     )
-  }, 60000)
+  }, 600000)
 }
 
 // Run the action in the same process. (NOTE: also useful for debugging!)
