@@ -10,7 +10,7 @@
     "format-check": "prettier --check 'src/**/*.ts'",
     "lint": "eslint src/**/*.ts",
     "package": "ncc build --source-map --license licenses.txt",
-    "test": "jest",
+    "test": "jest --runInBand",
     "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
   },
   "repository": {
@@ -30,7 +30,7 @@
   "devDependencies": {
     "@types/node": "^20.3.2",
     "@types/rimraf": "^4.0.5",
-    "@typescript-eslint/parser": "^5.60.1",
+    "@typescript-eslint/parser": "^5.61.0",
     "@vercel/ncc": "^0.36.1",
     "eslint": "^8.43.0",
     "eslint-plugin-github": "^4.8.0",
