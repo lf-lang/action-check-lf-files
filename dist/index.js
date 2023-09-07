@@ -66,7 +66,7 @@ function gradleStop(dir) {
 }
 exports.gradleStop = gradleStop;
 function configurePath(dir) {
-    process.env.PATH = `${process.env.PATH}:${path.join(path.resolve(dir), 'bin')}`;
+    process.env.PATH = `${process.env.PATH}:${path.join(path.resolve(dir), 'build/install/lf-cli/bin/')}`;
 }
 exports.configurePath = configurePath;
 

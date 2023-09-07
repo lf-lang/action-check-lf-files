@@ -22,6 +22,6 @@ export async function gradleStop(dir: string): Promise<void> {
 export function configurePath(dir: string): void {
   process.env.PATH = `${process.env.PATH}:${path.join(
     path.resolve(dir),
-    'bin'
+    'build/install/lf-cli/bin/'
   )}`
 }
