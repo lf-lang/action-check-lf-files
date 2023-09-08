@@ -16,11 +16,11 @@ export async function clone(ref: string, dir: string): Promise<void> {
 }
 
 export async function build(dir: string): Promise<void> {
-  exec('./gradlew assemble', {cwd: dir})
+  await exec('./gradlew assemble', {cwd: dir})
 }
 
 export async function gradleStop(dir: string): Promise<void> {
-  exec('./gradlew --stop', {cwd: dir})
+  await exec('./gradlew --stop', {cwd: dir})
 }
 
 export function configurePath(dir: string): void {

@@ -61,13 +61,13 @@ function clone(ref, dir) {
 exports.clone = clone;
 function build(dir) {
     return __awaiter(this, void 0, void 0, function* () {
-        exec('./gradlew assemble', { cwd: dir });
+        yield exec('./gradlew assemble', { cwd: dir });
     });
 }
 exports.build = build;
 function gradleStop(dir) {
     return __awaiter(this, void 0, void 0, function* () {
-        exec('./gradlew --stop', { cwd: dir });
+        yield exec('./gradlew --stop', { cwd: dir });
     });
 }
 exports.gradleStop = gradleStop;
