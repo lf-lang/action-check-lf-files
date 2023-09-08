@@ -15,6 +15,10 @@ export async function clone(ref: string, dir: string): Promise<void> {
   await exec('git submodule update --init', {cwd: dir})
 }
 
+export async function build(dir: string): Promise<void> {
+  exec('./gradlew assemble', {cwd: dir})
+}
+
 export async function gradleStop(dir: string): Promise<void> {
   exec('./gradlew --stop', {cwd: dir})
 }
@@ -22,6 +26,6 @@ export async function gradleStop(dir: string): Promise<void> {
 export function configurePath(dir: string): void {
   process.env.PATH = `${process.env.PATH}:${path.join(
     path.resolve(dir),
-    'build/install/lf-cli/bin/'
+    'build/install/lf-cli/bin'
   )}`
 }

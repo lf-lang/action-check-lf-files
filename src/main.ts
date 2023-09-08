@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import {configurePath, deleteIfExists, clone, gradleStop} from './build'
+import {configurePath, deleteIfExists, clone, gradleStop, build} from './build'
 import {skipDirs, checkCompile, checkFormat} from './check'
 
 // eslint-disable-next-line no-shadow
@@ -33,6 +33,9 @@ export async function run(softError = false): Promise<string> {
       )
       await clone(ref, dir)
     }
+
+    core.info(`Building using Gradle`)
+    await build(dir)
 
     configurePath(dir)
 
