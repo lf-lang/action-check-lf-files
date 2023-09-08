@@ -39,7 +39,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.configurePath = exports.gradleStop = exports.clone = exports.deleteIfExists = void 0;
+exports.configurePath = exports.gradleStop = exports.build = exports.clone = exports.deleteIfExists = void 0;
 const child_process = __importStar(__nccwpck_require__(81));
 const promises_1 = __nccwpck_require__(977);
 const path = __importStar(__nccwpck_require__(411));
@@ -59,14 +59,20 @@ function clone(ref, dir) {
     });
 }
 exports.clone = clone;
+function build(dir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield exec('./gradlew assemble', { cwd: dir });
+    });
+}
+exports.build = build;
 function gradleStop(dir) {
     return __awaiter(this, void 0, void 0, function* () {
-        exec('./gradlew --stop', { cwd: dir });
+        yield exec('./gradlew --stop', { cwd: dir });
     });
 }
 exports.gradleStop = gradleStop;
 function configurePath(dir) {
-    process.env.PATH = `${process.env.PATH}:${path.join(path.resolve(dir), 'bin')}`;
+    process.env.PATH = `${process.env.PATH}:${path.join(path.resolve(dir), 'build/install/lf-cli/bin')}`;
 }
 exports.configurePath = configurePath;
 
@@ -244,6 +250,8 @@ function run(softError = false) {
                 core.info(`Cloning the Lingua Franca repository (${ref}) into directory '${dir}'...`);
                 yield (0, build_1.clone)(ref, dir);
             }
+            core.info(`Building using Gradle...`);
+            yield (0, build_1.build)(dir);
             (0, build_1.configurePath)(dir);
             core.info('Checking all Lingua Franca files:');
             check_1.skipDirs.push(dir);
