@@ -250,7 +250,7 @@ function run(softError = false) {
                 core.info(`Cloning the Lingua Franca repository (${ref}) into directory '${dir}'...`);
                 yield (0, build_1.clone)(ref, dir);
             }
-            core.info(`Building using Gradle`);
+            core.info(`Building using Gradle...`);
             yield (0, build_1.build)(dir);
             (0, build_1.configurePath)(dir);
             core.info('Checking all Lingua Franca files:');

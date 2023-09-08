@@ -34,7 +34,7 @@ export async function run(softError = false): Promise<string> {
       await clone(ref, dir)
     }
 
-    core.info(`Building using Gradle`)
+    core.info(`Building using Gradle...`)
     await build(dir)
 
     configurePath(dir)
