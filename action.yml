@@ -1,5 +1,5 @@
 name: 'Check Lingua Franca files'
-description: 'Ensure that all Lingua Franca files compile'
+description: 'Ensure that all Lingua Franca files compile and are formatted correctly'
 author: 'Marten Lohstroh'
 inputs:
   check_mode:
