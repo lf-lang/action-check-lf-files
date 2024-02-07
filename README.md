@@ -3,8 +3,9 @@
 </p>
 
 # Summary
-
-This GitHub action recursively visits a given `search_dir`, finds every `.lf` file, and reports each file that failed to compile.
+Action for repositories with Lingua Franca code to ensure that the source files work with a particular version of the compiler (the latest release is used by default).
+It recursively visits a given `search_dir`, finds every `.lf` file, and reports each file that either fails a `compile` or `format` check, depending on the specified `check_mode` parameter.
+This action was initially developed for use in the [Lingua Franca Playground](https://github.com/lf-lang/playground-lingua-franca).
 
 # Usage
 
