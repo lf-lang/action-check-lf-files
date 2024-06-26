@@ -11,7 +11,7 @@
     "lint": "eslint src/**/*.ts",
     "package": "ncc build --source-map --license licenses.txt",
     "test": "jest --runInBand",
-    "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
+    "all": "yarn run build && yarn run format && yarn run lint && yarn run package && yarn test"
   },
   "repository": {
     "type": "git",
@@ -30,7 +30,6 @@
   "devDependencies": {
     "@types/node": "^20.14.9",
     "@types/rimraf": "^4.0.5",
-    "@typescript-eslint/parser": "^7.14.1",
     "@vercel/ncc": "^0.38.1",
     "eslint": "^9.5.0",
     "eslint-plugin-github": "^5.0.1",
@@ -41,6 +40,7 @@
     "prettier": "^3.3.2",
     "rimraf": "^5.0.7",
     "ts-jest": "^29.1.5",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.2",
+    "yarn": "^1.22.22"
   }
 }
